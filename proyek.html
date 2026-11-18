@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title data-i18n="projectsTitle">
+      Proyek Belajar
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="translations.js"></script>
+    <script src="auth.js"></script>
+
+    <style>
+      .projects-hero {
+        padding: 160px 8vw 60px;
+        text-align: center;
+        background: linear-gradient(
+          135deg,
+          #a8edea,
+          #fed6e3
+        );
+      }
+
+      .projects-hero h1 {
+        margin-bottom: 16px;
+        font-size: clamp(2rem, 5vw, 3rem);
+      }
+
+      .projects-content {
+        max-width: 1200px;
+        padding: 60px 8vw;
+        margin: 0 auto;
+      }
+
+      .level-section {
+        margin-bottom: 60px;
+      }
+
+      .level-section h2 {
+        margin-bottom: 24px;
+        color: var(--blue);
+        font-size: 1.8rem;
+      }
+
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(280px, 1fr)
+        );
+        gap: 24px;
+      }
+
+      .project-card {
+        padding: 28px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        transition: transform 0.2s ease;
+      }
+
+      .project-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .project-card h3 {
+        margin-bottom: 12px;
+        color: var(--blue);
+        font-size: 1.3rem;
+      }
+
+      .project-card p {
+        margin-bottom: 20px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .project-btn {
+        display: inline-block;
+        padding: 10px 24px;
+        color: #ffffff;
+        font-weight: 600;
+        background: var(--blue);
+        border-radius: 999px;
+      }
+
+      .project-btn:hover {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <button
+          class="logo"
+          id="menuToggle"
+          type="button"
+          aria-label="Buka menu"
+        >
+          <span class="menu-icon">☰</span>
+        </button>
+
+        <ul class="nav-links">
+          <li>
+            <a href="index.html#home" data-i18n="navHome">
+              Home
+            </a>
+          </li>
+
+          <li>
+            <a href="tentang.html" data-i18n="navAbout">
+              Tentang
+            </a>
+          </li>
+
+          <li>
+            <a
+              href="proyek.html"
+              class="active"
+              data-i18n="navProjects"
+            >
+              Proyek
+            </a>
+          </li>
+
+          <li class="has-submenu">
+            <button
+              type="button"
+              class="submenu-toggle"
+              data-i18n="navContact"
+            >
+              Kontak
+            </button>
+
+            <ul class="sub-menu">
+              <li>
+                <a href="cs.html" data-i18n="navCS">
+                  🤖 Customer Service
+                </a>
+              </li>
+
+              <li>
+                <a href="support.html" data-i18n="navSupport">
+                  🛠️ Support & Pengaturan
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="mailto:muhammadhaedarrizkyanwar@gmail.com"
+                  data-i18n="navEmail"
+                >
+                  ✉️ Email
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="https://www.instagram.com/mu.ha.riz_/"
+                  target="_blank"
+                  rel="noopener"
+                  data-i18n="navInstagram"
+                >
+                  📷 Instagram
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="has-submenu profile-menu">
+            <button
+              type="button"
+              class="submenu-toggle profile-toggle"
+              aria-label="Akun"
+            >
+              👤
+            </button>
+
+            <ul
+              class="sub-menu profile-dropdown"
+              data-profile-dropdown
+            ></ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="projects-hero">
+        <h1 data-i18n="projectsTitle">
+          Proyek Belajar
+        </h1>
+
+        <p data-i18n="projectsSubtitle">
+          Pilih materi sesuai level kamu
+        </p>
+      </section>
+
+      <section class="projects-content">
+        <button
+          type="button"
+          class="back-previous-btn"
+          data-i18n="backPrevious"
+          onclick="goBackOrHome('index.html')"
+        >
+          ← Kembali ke Halaman Sebelumnya
+        </button>
+
+        <div class="level-section">
+          <h2 data-i18n="levelBeginner">
+            Level 1: Pemula
+          </h2>
+
+          <div class="project-grid">
+            <div class="project-card">
+              <h3 data-i18n="hangeulTitle">
+                📝 한글 - Hangeul
+              </h3>
+
+              <p data-i18n="hangeulDesc">
+                Belajar alfabet Korea dari dasar.
+              </p>
+
+              <a
+                href="hangeul.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+
+            <div class="project-card">
+              <h3 data-i18n="vocabTitle">
+                📚 어휘 - Kosakata
+              </h3>
+
+              <p data-i18n="vocabDesc">
+                Kosakata dasar bahasa Korea untuk kehidupan
+                sehari-hari.
+              </p>
+
+              <a
+                href="kosakata.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+
+            <div class="project-card">
+              <h3 data-i18n="grammarTitle">
+                📖 문법 - Tata Bahasa
+              </h3>
+
+              <p data-i18n="grammarDesc">
+                Pelajari tata bahasa Korea dasar.
+              </p>
+
+              <a
+                href="tatabahasa.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-section">
+          <h2 data-i18n="levelIntermediate">
+            Level 2: Menengah
+          </h2>
+
+          <div class="project-grid">
+            <div class="project-card">
+              <h3 data-i18n="topik1Title">
+                🎯 TOPIK I
+              </h3>
+
+              <p data-i18n="topik1Desc">
+                Persiapan ujian TOPIK Level 1-2.
+              </p>
+
+              <a
+                href="topik.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+
+            <div class="project-card">
+              <h3 data-i18n="conversationTitle">
+                💬 회화 - Percakapan
+              </h3>
+
+              <p data-i18n="conversationDesc">
+                Dialog percakapan sehari-hari dalam bahasa Korea.
+              </p>
+
+              <a
+                href="percakapan.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+
+            <div class="project-card">
+              <h3 data-i18n="vocab2Title">
+                📖 어휘 2 - Kosakata 2
+              </h3>
+
+              <p data-i18n="vocab2Desc">
+                Kosakata tingkat menengah.
+              </p>
+
+              <a
+                href="kosakata2.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-section">
+          <h2 data-i18n="levelAdvanced">
+            Level 3: Lanjutan
+          </h2>
+
+          <div class="project-grid">
+            <div class="project-card">
+              <h3 data-i18n="topik2Title">
+                🎯 TOPIK II
+              </h3>
+
+              <p data-i18n="topik2Desc">
+                Persiapan ujian TOPIK Level 3-6.
+              </p>
+
+              <a
+                href="topik2.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+
+            <div class="project-card">
+              <h3 data-i18n="newsTitle">
+                📰 뉴스 - Membaca Berita
+              </h3>
+
+              <p data-i18n="newsDesc">
+                Latihan membaca berita Korea.
+              </p>
+
+              <a
+                href="news.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+
+            <div class="project-card">
+              <h3 data-i18n="cultureTitle">
+                🏮 문화 - Budaya Korea
+              </h3>
+
+              <p data-i18n="cultureDesc">
+                Pelajari budaya dan tradisi Korea.
+              </p>
+
+              <a
+                href="budaya.html"
+                class="project-btn"
+                data-i18n="startLearning"
+              >
+                Mulai Belajar →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">
+        © 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷
+      </p>
+    </footer>
+
+    <!--
+      Catatan: tombol "Kembali ke Halaman Sebelumnya" memanggil
+      goBackOrHome() dari translations.js. Tombol itu terlihat "tidak
+      berfungsi" sebelumnya karena translations.js gagal dimuat akibat
+      syntax error, bukan karena tombolnya sendiri salah. Menu hamburger
+      dan dropdown akun juga sudah ditangani auth.js, jadi script
+      duplikat di halaman ini dihapus.
+    -->
+  </body>
+</html>

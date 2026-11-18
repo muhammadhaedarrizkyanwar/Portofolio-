@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <script src="translations.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="hangeulPageTitle">한글 - Hangeul</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <style>
+      .material-hero{ background:linear-gradient(135deg, #2563eb, #0d9488); color:white; padding:160px 8vw 60px; text-align:center; }
+      .material-hero h1{ font-size:clamp(2rem, 5vw, 3rem); margin-bottom:16px; }
+      .material-hero .korean{ font-size:2.5rem; display:block; margin-top:12px; opacity:0.9; }
+      .material-content{ padding:60px 8vw; max-width:900px; margin:0 auto; }
+      .material-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:32px; margin-bottom:28px; transition:transform .25s ease, box-shadow .25s ease; }
+      .material-card:hover{ transform:translateY(-4px); box-shadow:var(--shadow); }
+      .material-card h2{ font-size:1.5rem; margin-bottom:16px; color:var(--blue); }
+      .material-card p{ color:var(--muted); line-height:1.8; white-space:pre-line; }
+      .back-btn{ display:inline-block; padding:10px 24px; background:var(--panel); border:1px solid var(--line); border-radius:999px; color:var(--blue); font-weight:600; margin-bottom:24px; transition:transform .2s ease; }
+      .back-btn:hover{ transform:translateY(-2px); background:var(--bg); }
+      .letter-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:12px; margin-top:20px; }
+      .letter-card{ background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:16px; text-align:center; }
+      .letter-card .korean{ font-size:2rem; color:var(--teal); margin-bottom:8px; }
+      .letter-card .roman{ font-size:0.85rem; color:var(--muted); }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <button class="logo" id="menuToggle" aria-label="Buka menu"><span class="menu-icon">☰</span></button>
+        <ul class="nav-links">
+          <li><a href="index.html#home" data-i18n="navHome">Home</a></li>
+          <li><a href="tentang.html" data-i18n="navAbout">Tentang</a></li>
+          <li><a href="proyek.html" data-i18n="navProjects">Proyek</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="material-hero">
+        <h1 data-i18n="hangeulTitle">한글<span class="korean" data-i18n="hangeulSubtitle">Hangeul</span></h1>
+        <p data-i18n="hangeulDesc2">Belajar huruf Korea dari dasar</p>
+      </section>
+
+      <section class="material-content">
+        <a href="proyek.html" class="back-btn" data-i18n="backToProjects">← Kembali ke Proyek</a>
+
+        <div class="material-card">
+          <h2 data-i18n="hangeulIntroTitle">📚 Pengantar Hangeul</h2>
+          <p data-i18n="hangeulIntroText">Hangeul adalah sistem tulisan Korea yang diciptakan oleh Raja Sejong pada tahun 1443. Terdiri dari 14 konsonan dasar dan 10 vokal dasar yang dapat dikombinasikan untuk membentuk berbagai suku kata.</p>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="hangeulConsonantsTitle">🔤 Konsonan Dasar (14)</h2>
+          <div class="letter-grid">
+            <div class="letter-card"><div class="korean">ㄱ</div><div class="roman">g/k</div></div>
+            <div class="letter-card"><div class="korean">ㄴ</div><div class="roman">n</div></div>
+            <div class="letter-card"><div class="korean">ㄷ</div><div class="roman">d</div></div>
+            <div class="letter-card"><div class="korean">ㄹ</div><div class="roman">r/l</div></div>
+            <div class="letter-card"><div class="korean">ㅁ</div><div class="roman">m</div></div>
+            <div class="letter-card"><div class="korean">ㅂ</div><div class="roman">b/p</div></div>
+            <div class="letter-card"><div class="korean">ㅅ</div><div class="roman">s</div></div>
+            <div class="letter-card"><div class="korean">ㅇ</div><div class="roman">ng</div></div>
+            <div class="letter-card"><div class="korean">ㅈ</div><div class="roman">j</div></div>
+            <div class="letter-card"><div class="korean">ㅊ</div><div class="roman">ch</div></div>
+            <div class="letter-card"><div class="korean">ㅋ</div><div class="roman">k</div></div>
+            <div class="letter-card"><div class="korean">ㅌ</div><div class="roman">t</div></div>
+            <div class="letter-card"><div class="korean">ㅍ</div><div class="roman">p</div></div>
+            <div class="letter-card"><div class="korean">ㅎ</div><div class="roman">h</div></div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="hangeulVowelsTitle">🔤 Vokal Dasar (10)</h2>
+          <div class="letter-grid">
+            <div class="letter-card"><div class="korean">ㅏ</div><div class="roman">a</div></div>
+            <div class="letter-card"><div class="korean">ㅑ</div><div class="roman">ya</div></div>
+            <div class="letter-card"><div class="korean">ㅓ</div><div class="roman">eo</div></div>
+            <div class="letter-card"><div class="korean">ㅕ</div><div class="roman">yeo</div></div>
+            <div class="letter-card"><div class="korean">ㅗ</div><div class="roman">o</div></div>
+            <div class="letter-card"><div class="korean">ㅛ</div><div class="roman">yo</div></div>
+            <div class="letter-card"><div class="korean">ㅜ</div><div class="roman">u</div></div>
+            <div class="letter-card"><div class="korean">ㅠ</div><div class="roman">yu</div></div>
+            <div class="letter-card"><div class="korean">ㅡ</div><div class="roman">eu</div></div>
+            <div class="letter-card"><div class="korean">ㅣ</div><div class="roman">i</div></div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="hangeulDiphthongsTitle">🔤 Vokal Rangkap / Diftong (11)</h2>
+          <div class="letter-grid">
+            <div class="letter-card"><div class="korean">ㅐ</div><div class="roman">ae</div></div>
+            <div class="letter-card"><div class="korean">ㅒ</div><div class="roman">yae</div></div>
+            <div class="letter-card"><div class="korean">ㅔ</div><div class="roman">e</div></div>
+            <div class="letter-card"><div class="korean">ㅖ</div><div class="roman">ye</div></div>
+            <div class="letter-card"><div class="korean">ㅘ</div><div class="roman">wa</div></div>
+            <div class="letter-card"><div class="korean">ㅙ</div><div class="roman">wae</div></div>
+            <div class="letter-card"><div class="korean">ㅚ</div><div class="roman">oe</div></div>
+            <div class="letter-card"><div class="korean">ㅝ</div><div class="roman">wo</div></div>
+            <div class="letter-card"><div class="korean">ㅞ</div><div class="roman">we</div></div>
+            <div class="letter-card"><div class="korean">ㅟ</div><div class="roman">wi</div></div>
+            <div class="letter-card"><div class="korean">ㅢ</div><div class="roman">ui</div></div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="hangeulConsonantsDoubleTitle">🔤 Konsonan Ganda / Komposit (16)</h2>
+          <div class="letter-grid">
+            <div class="letter-card"><div class="korean">ㄲ</div><div class="roman">kk</div></div>
+            <div class="letter-card"><div class="korean">ㄸ</div><div class="roman">tt</div></div>
+            <div class="letter-card"><div class="korean">ㅃ</div><div class="roman">pp</div></div>
+            <div class="letter-card"><div class="korean">ㅆ</div><div class="roman">ss</div></div>
+            <div class="letter-card"><div class="korean">ㅉ</div><div class="roman">jj</div></div>
+            <div class="letter-card"><div class="korean">ㄳ</div><div class="roman">gs</div></div>
+            <div class="letter-card"><div class="korean">ㄵ</div><div class="roman">nj</div></div>
+            <div class="letter-card"><div class="korean">ㄶ</div><div class="roman">nh</div></div>
+            <div class="letter-card"><div class="korean">ㄺ</div><div class="roman">lg</div></div>
+            <div class="letter-card"><div class="korean">ㄻ</div><div class="roman">lm</div></div>
+            <div class="letter-card"><div class="korean">ㄼ</div><div class="roman">lb</div></div>
+            <div class="letter-card"><div class="korean">ㄽ</div><div class="roman">ls</div></div>
+            <div class="letter-card"><div class="korean">ㄾ</div><div class="roman">lt</div></div>
+            <div class="letter-card"><div class="korean">ㄿ</div><div class="roman">lp</div></div>
+            <div class="letter-card"><div class="korean">ㅀ</div><div class="roman">lh</div></div>
+            <div class="letter-card"><div class="korean">ㅄ</div><div class="roman">bs</div></div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="tipsTitle">💡 Tips Belajar</h2>
+          <p data-i18n="hangeulTips">1. Hafalkan konsonan dan vokal dasar terlebih dahulu
+2. Latihan menulis setiap huruf berulang-ulang
+3. Gabungkan konsonan dan vokal untuk membentuk suku kata
+4. Baca teks Korea sederhana setiap hari</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">© 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷</p>
+    </footer>
+
+    <!--
+      Catatan: hamburger menu sudah ditangani otomatis oleh auth.js
+      (initNavigation), jadi script duplikat untuk menuToggle dihapus
+      dari halaman ini.
+    -->
+  </body>
+</html>

@@ -1,0 +1,1702 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Service</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <script src="translations.js"></script>
+
+  <!-- KaTeX: dipakai untuk merender rumus/simbol matematika (pecahan,
+       pangkat, akar, dll) supaya tampil rapi seperti di aplikasi Claude,
+       bukan cuma teks datar.
+
+       Dimuat secara manual (bukan <link>/<script> statis) supaya bisa:
+       1) fallback ke CDN kedua (jsdelivr) kalau cdnjs diblokir/gagal
+       2) ditandai lewat window.katexReady / window.katexFailed supaya
+          kode di bawah tahu kapan aman memanggil renderMathInElement -->
+  <script>
+    (function loadKatex() {
+      function loadScript(src, onload, onerror) {
+        const s = document.createElement("script");
+        s.src = src;
+        s.defer = true;
+        s.onload = onload;
+        s.onerror = onerror;
+        document.head.appendChild(s);
+      }
+
+      function loadCss(href) {
+        const l = document.createElement("link");
+        l.rel = "stylesheet";
+        l.href = href;
+        document.head.appendChild(l);
+      }
+
+      const CDNS = [
+        {
+          css: "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css",
+          core: "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js",
+          auto: "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+        },
+        {
+          css: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
+          core: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js",
+          auto: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        }
+      ];
+
+      let i = 0;
+
+      function tryLoad() {
+        if (i >= CDNS.length) {
+          console.warn("KaTeX gagal dimuat dari semua CDN.");
+          window.katexFailed = true;
+          return;
+        }
+
+        const cdn = CDNS[i];
+
+        loadCss(cdn.css);
+
+        loadScript(
+          cdn.core,
+          function () {
+            loadScript(
+              cdn.auto,
+              function () {
+                window.katexReady = true;
+              },
+              nextCdn
+            );
+          },
+          nextCdn
+        );
+      }
+
+      function nextCdn() {
+        i += 1;
+        tryLoad();
+      }
+
+      tryLoad();
+    })();
+  </script>
+
+  <style>
+    header {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 99999 !important;
+    }
+
+    .cs-page {
+      min-height: 100vh;
+      padding: 140px 8vw 70px;
+    }
+
+    .cs-page h1 {
+      margin-bottom: 10px;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .cs-description {
+      margin-bottom: 30px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 28px;
+      color: var(--blue);
+      font-weight: 700;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .back-button:hover {
+      background: var(--bg);
+      border-color: var(--teal);
+    }
+
+    .cs-chat-layout {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .chat-sidebar {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      gap: 12px;
+      width: 260px;
+      max-height: 596px;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header .sidebar-title {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .sidebar-toggle-btn,
+    .sidebar-close-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      color: var(--text);
+      font-size: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .new-chat-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.88rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .new-chat-btn:hover {
+      border-color: var(--teal);
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .history-item:hover {
+      background: var(--bg);
+    }
+
+    .history-item.active {
+      background: var(--bg);
+      box-shadow: inset 3px 0 0 var(--teal);
+    }
+
+    .history-item-title {
+      flex: 1;
+      overflow: hidden;
+      color: var(--text);
+      font-size: 0.85rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .history-delete-btn {
+      flex-shrink: 0;
+      padding: 3px 7px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    .history-delete-btn:hover {
+      color: #b3261e;
+      background: var(--panel);
+      opacity: 1;
+    }
+
+    .history-empty {
+      padding: 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    .chat-sidebar-overlay {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .cs-chat-layout {
+        display: block;
+      }
+
+      .chat-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100000;
+        width: 78vw;
+        max-width: 300px;
+        max-height: none;
+        height: 100vh;
+        border-radius: 0 16px 16px 0;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+      }
+
+      .chat-sidebar.open {
+        transform: translateX(0);
+      }
+
+      .chat-sidebar-overlay.open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: rgba(0, 0, 0, 0.35);
+      }
+
+      .sidebar-toggle-btn,
+      .sidebar-close-btn {
+        display: flex;
+      }
+    }
+
+    .chat-container {
+      max-width: 860px;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 22px;
+      color: var(--text);
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95rem;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      height: 460px;
+      padding: 26px 24px;
+      overflow-y: auto;
+      background: var(--panel);
+    }
+
+    .chat-message {
+      max-width: 100%;
+      padding: 0;
+      text-align: left !important;
+      white-space: pre-wrap;
+      line-height: 1.65;
+      font-size: 0.95rem;
+      border-radius: 0;
+      background: none;
+      border: none;
+    }
+
+    .chat-message.bot {
+      align-self: flex-start;
+      max-width: 85%;
+      padding: 10px 16px;
+      color: var(--text);
+      background: var(--bg);
+      border-radius: 18px;
+    }
+
+    .chat-message.user {
+      align-self: flex-end;
+      max-width: 78%;
+      padding: 10px 16px;
+      color: var(--text);
+      background: var(--bg);
+      border-radius: 18px;
+      cursor: pointer;
+    }
+
+    .chat-message.user:hover {
+      filter: brightness(0.97);
+    }
+
+    .chat-message.user.editing {
+      cursor: default;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--teal);
+    }
+
+    .chat-message.user.editing:hover {
+      filter: none;
+    }
+
+    .edit-input {
+      width: 100%;
+      padding: 8px 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .edit-actions button {
+      padding: 6px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .edit-save {
+      color: #fff !important;
+      background: var(--text) !important;
+      border: none !important;
+    }
+
+    .chat-message.error {
+      align-self: flex-start;
+      max-width: 90%;
+      padding: 10px 16px;
+      color: #b3261e;
+      background: #fdecea;
+      border-radius: 12px;
+      border: 1px solid #f3b6bd;
+    }
+
+    .chat-message .katex-display {
+      margin: 10px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .thinking-dots {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .thinking-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--muted);
+      border-radius: 50%;
+      animation: thinking-bounce 1.2s infinite ease-in-out;
+    }
+
+    .thinking-dots span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .thinking-dots span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes thinking-bounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+      30% {
+        transform: translateY(-4px);
+        opacity: 1;
+      }
+    }
+
+    .chat-input-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 0.95rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .chat-input-area input:focus {
+      border-color: var(--teal);
+    }
+
+    .chat-input-area button {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      color: #fff;
+      font-size: 1.1rem;
+      background: var(--text);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .chat-input-area button:hover {
+      opacity: 0.85;
+    }
+
+    .chat-input-area button:disabled,
+    .chat-input-area input:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 720px) {
+      #menuToggle {
+        display: flex !important;
+      }
+
+      #mainNav {
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        left: 0 !important;
+        display: none !important;
+        flex-direction: column !important;
+        padding: 12px 8vw 20px !important;
+        background: var(--panel) !important;
+        border-bottom: 1px solid var(--line);
+      }
+
+      #mainNav.open {
+        display: flex !important;
+      }
+
+      #mainNav > li,
+      #mainNav > li > a,
+      #mainNav > li > button {
+        width: 100% !important;
+      }
+
+      #mainNav > li > a,
+      #mainNav > li > button {
+        display: block !important;
+        padding: 14px 0 !important;
+        color: var(--text) !important;
+        text-align: left !important;
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1px solid var(--line) !important;
+      }
+
+      #mainNav .sub-menu {
+        position: static !important;
+        display: none !important;
+        padding-left: 18px !important;
+        background: var(--panel) !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      #mainNav .sub-menu.open {
+        display: block !important;
+      }
+
+      .chat-input-area button {
+        width: 38px;
+        height: 38px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <button
+        id="menuToggle"
+        class="logo"
+        type="button"
+        aria-label="Buka menu"
+        aria-expanded="false"
+      >
+        <span class="menu-icon">☰</span>
+      </button>
+
+      <ul class="nav-links" id="mainNav">
+        <li>
+          <a href="index.html#home" data-i18n="navHome">
+            Home
+          </a>
+        </li>
+
+        <li>
+          <a href="tentang.html" data-i18n="navAbout">
+            Tentang
+          </a>
+        </li>
+
+        <li>
+          <a href="proyek.html" data-i18n="navProjects">
+            Proyek
+          </a>
+        </li>
+
+        <li class="has-submenu">
+          <button
+            type="button"
+            class="submenu-toggle"
+            data-i18n="navContact"
+            aria-expanded="false"
+          >
+            Kontak
+          </button>
+
+          <ul class="sub-menu">
+            <li>
+              <a href="cs.html" data-i18n="navCS">
+                🤖 Customer Service
+              </a>
+            </li>
+
+            <li>
+              <a href="support.html" data-i18n="navSupport">
+                🛠️ Support & Pengaturan
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="mailto:muhammadhaedarrizkyanwar@gmail.com"
+                data-i18n="navEmail"
+              >
+                ✉️ Email
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="https://www.instagram.com/mu.ha.riz_/"
+                target="_blank"
+                rel="noopener"
+                data-i18n="navInstagram"
+              >
+                📷 Instagram
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="has-submenu">
+          <button
+            type="button"
+            class="submenu-toggle profile-toggle"
+            aria-label="Akun"
+            aria-expanded="false"
+          >
+            👤
+          </button>
+
+          <ul class="sub-menu">
+            <li>
+              <a href="login.html">🔑 Login</a>
+            </li>
+
+            <li>
+              <a href="register.html">📝 Daftar</a>
+            </li>
+
+            <li>
+              <a href="dashboard.html">👤 Dashboard</a>
+            </li>
+
+            <li>
+              <a href="admin.html">🔐 Admin Panel</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="cs-page">
+      <button
+        id="backButton"
+        class="back-button"
+        type="button"
+        data-i18n="backPrevious"
+      >
+        ← Kembali ke Halaman Sebelumnya
+      </button>
+
+      <h1 data-i18n="csTitle">
+        Customer Service
+      </h1>
+
+      <p class="cs-description" data-i18n="csText">
+        Tanyakan apa saja kepada asisten AI.
+      </p>
+
+      <div class="cs-chat-layout">
+        <aside id="chatSidebar" class="chat-sidebar">
+          <div class="sidebar-header">
+            <span class="sidebar-title">Riwayat Chat</span>
+            <button
+              id="closeSidebarBtn"
+              class="sidebar-close-btn"
+              type="button"
+              aria-label="Tutup riwayat"
+            >
+              ✕
+            </button>
+          </div>
+
+          <button
+            id="newChatBtn"
+            class="new-chat-btn"
+            type="button"
+          >
+            + Chat Baru
+          </button>
+
+          <div id="historyList" class="history-list"></div>
+        </aside>
+
+        <div
+          id="sidebarOverlay"
+          class="chat-sidebar-overlay"
+        ></div>
+
+        <div class="chat-container">
+          <div class="chat-header">
+            <button
+              id="openSidebarBtn"
+              class="sidebar-toggle-btn"
+              type="button"
+              aria-label="Buka riwayat chat"
+            >
+              ☰
+            </button>
+
+            <span>Kkuljaem AI Assistant</span>
+          </div>
+
+          <div id="chatBox" class="chat-box">
+            <div class="chat-message bot greeting">Annyeong! 👋 Aku asisten AI Kkuljaem Korea. Tanyakan apa saja ya!</div>
+          </div>
+
+          <div class="chat-input-area">
+            <input
+              id="chatInput"
+              type="text"
+              autocomplete="off"
+              placeholder="Tanyakan apa saja..."
+              data-i18n-placeholder="chatPlaceholder"
+            >
+
+            <button
+              id="sendButton"
+              type="button"
+              aria-label="Kirim"
+            >
+              ↑
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p data-i18n="footerText">
+      © 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷
+    </p>
+  </footer>
+
+  <script>
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+        const menuToggle =
+          document.getElementById("menuToggle");
+
+        const mainNav =
+          document.getElementById("mainNav");
+
+        const backButton =
+          document.getElementById("backButton");
+
+        const chatBox =
+          document.getElementById("chatBox");
+
+        const chatInput =
+          document.getElementById("chatInput");
+
+        const sendButton =
+          document.getElementById("sendButton");
+
+        const chatSidebar =
+          document.getElementById("chatSidebar");
+
+        const sidebarOverlay =
+          document.getElementById("sidebarOverlay");
+
+        const openSidebarBtn =
+          document.getElementById("openSidebarBtn");
+
+        const closeSidebarBtn =
+          document.getElementById("closeSidebarBtn");
+
+        const newChatBtn =
+          document.getElementById("newChatBtn");
+
+        const historyList =
+          document.getElementById("historyList");
+
+        function closeSubmenus() {
+          document
+            .querySelectorAll("#mainNav .sub-menu.open")
+            .forEach(function (menu) {
+              menu.classList.remove("open");
+            });
+
+          document
+            .querySelectorAll("#mainNav .submenu-toggle")
+            .forEach(function (button) {
+              button.setAttribute(
+                "aria-expanded",
+                "false"
+              );
+            });
+        }
+
+        function closeMenu() {
+          mainNav.classList.remove("open");
+
+          menuToggle.setAttribute(
+            "aria-expanded",
+            "false"
+          );
+        }
+
+        menuToggle.onclick = function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const isOpen =
+            mainNav.classList.contains("open");
+
+          if (isOpen) {
+            closeMenu();
+          } else {
+            mainNav.classList.add("open");
+
+            menuToggle.setAttribute(
+              "aria-expanded",
+              "true"
+            );
+          }
+        };
+
+        document
+          .querySelectorAll("#mainNav .submenu-toggle")
+          .forEach(function (toggle) {
+            toggle.onclick = function (event) {
+              event.preventDefault();
+              event.stopPropagation();
+
+              const submenu =
+                toggle.nextElementSibling;
+
+              const wasOpen =
+                submenu.classList.contains("open");
+
+              closeSubmenus();
+
+              if (!wasOpen) {
+                submenu.classList.add("open");
+
+                toggle.setAttribute(
+                  "aria-expanded",
+                  "true"
+                );
+              }
+            };
+          });
+
+        document
+          .querySelectorAll("#mainNav a")
+          .forEach(function (link) {
+            link.onclick = function () {
+              closeSubmenus();
+              closeMenu();
+            };
+          });
+
+        document.onclick = function (event) {
+          if (
+            !event.target.closest("#mainNav") &&
+            !event.target.closest("#menuToggle")
+          ) {
+            closeSubmenus();
+            closeMenu();
+          }
+        };
+
+        if (backButton) {
+          backButton.onclick = function () {
+            if (window.history.length > 1) {
+              window.history.back();
+            } else {
+              window.location.href = "index.html";
+            }
+          };
+        }
+
+        if (
+          typeof window.applyTranslations ===
+          "function"
+        ) {
+          window.applyTranslations();
+        }
+
+        // Cegah teks (termasuk balasan AI) disuntikkan sebagai HTML asli.
+        function escapeHTML(str) {
+          return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
+        // Coba render rumus matematika di dalam elemen `el` memakai KaTeX.
+        // Kalau KaTeX belum siap (masih loading dari CDN), coba lagi tiap
+        // 200ms sampai maksimal ~5 detik sebelum menyerah dan membiarkan
+        // teks LaTeX mentah tampil apa adanya (aman, tidak error).
+        function renderMathWhenReady(el, attempt) {
+          attempt = attempt || 0;
+
+          if (typeof renderMathInElement === "function") {
+            renderMathInElement(el, {
+              delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "\\[", right: "\\]", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false }
+              ],
+              throwOnError: false
+            });
+            return;
+          }
+
+          if (window.katexFailed || attempt > 25) {
+            return;
+          }
+
+          setTimeout(function () {
+            renderMathWhenReady(el, attempt + 1);
+          }, 200);
+        }
+
+        function addMessage(text, type) {
+          const message =
+            document.createElement("div");
+
+          message.className =
+            "chat-message " + type;
+
+          if (type === "bot") {
+            // Balasan bot dirender lewat innerHTML (bukan textContent)
+            // supaya KaTeX bisa menggambar rumus matematika di dalamnya.
+            // Teksnya di-escape dulu supaya tidak ada HTML asli yang
+            // bisa dijalankan (aman dari injeksi).
+            message.innerHTML = escapeHTML(text);
+
+            renderMathWhenReady(message);
+          } else {
+            message.textContent = text;
+          }
+
+          if (type === "user") {
+            message.title =
+              "Klik untuk mengedit pesan ini";
+
+            message.addEventListener(
+              "click",
+              function () {
+                startEditMessage(message);
+              }
+            );
+          }
+
+          chatBox.appendChild(message);
+          chatBox.scrollTop =
+            chatBox.scrollHeight;
+
+          return message;
+        }
+
+        // Klik pesan yang sudah dikirim (bubble user) untuk mengedit
+        // dan mengirim ulang. Semua balasan setelah pesan itu (yang
+        // sudah tidak relevan lagi) otomatis dihapus dari chat.
+        function startEditMessage(message) {
+          // Jangan bisa edit kalau sedang menunggu jawaban AI,
+          // atau kalau pesan ini sedang diedit juga.
+          if (
+            sendButton.disabled ||
+            message.classList.contains("editing")
+          ) {
+            return;
+          }
+
+          const originalText = message.textContent;
+
+          message.classList.add("editing");
+          message.textContent = "";
+
+          const input =
+            document.createElement("input");
+
+          input.type = "text";
+          input.className = "edit-input";
+          input.value = originalText;
+
+          input.addEventListener("click", function (event) {
+            event.stopPropagation();
+          });
+
+          const actions =
+            document.createElement("div");
+
+          actions.className = "edit-actions";
+
+          const cancelBtn =
+            document.createElement("button");
+
+          cancelBtn.type = "button";
+          cancelBtn.className = "edit-cancel";
+          cancelBtn.textContent = "✕ Batal";
+
+          const saveBtn =
+            document.createElement("button");
+
+          saveBtn.type = "button";
+          saveBtn.className = "edit-save";
+          saveBtn.textContent = "✓ Kirim Ulang";
+
+          actions.appendChild(cancelBtn);
+          actions.appendChild(saveBtn);
+
+          message.appendChild(input);
+          message.appendChild(actions);
+
+          input.focus();
+          input.setSelectionRange(
+            input.value.length,
+            input.value.length
+          );
+
+          function cancelEdit(event) {
+            if (event) {
+              event.stopPropagation();
+            }
+
+            message.classList.remove("editing");
+            message.textContent = originalText;
+          }
+
+          cancelBtn.onclick = cancelEdit;
+
+          async function submitEdit(event) {
+            if (event) {
+              event.stopPropagation();
+            }
+
+            const newText = input.value.trim();
+
+            if (!newText) {
+              cancelEdit();
+              return;
+            }
+
+            // Hapus semua pesan setelah ini (jawaban lama & seterusnya),
+            // karena sudah tidak nyambung lagi dengan pertanyaan baru.
+            while (message.nextSibling) {
+              message.nextSibling.remove();
+            }
+
+            message.classList.remove("editing");
+            message.textContent = newText;
+
+            await resendFrom(newText);
+          }
+
+          saveBtn.onclick = submitEdit;
+
+          input.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              submitEdit(event);
+            } else if (event.key === "Escape") {
+              event.preventDefault();
+              cancelEdit(event);
+            }
+          });
+        }
+
+        // Berapa banyak pesan (user + bot) terakhir yang tetap dikirim
+        // sebagai konteks ke AI. Dibatasi supaya payload tidak membengkak
+        // kalau obrolannya sudah sangat panjang. 24 pesan ~ 12 kali
+        // tanya-jawab terakhir, cukup untuk menjaga konteks tetap nyambung.
+        const MAX_HISTORY_MESSAGES = 24;
+
+        // Susun ulang seluruh riwayat chat yang MASIH tampil di layar
+        // menjadi array {role, content} untuk dikirim ke AI. Karena ini
+        // dibaca langsung dari DOM (bukan variabel terpisah), otomatis
+        // selalu sinkron dengan apa yang user lihat — termasuk saat user
+        // mengedit pesan lama (pesan-pesan setelahnya sudah dihapus dari
+        // DOM duluan, jadi tidak akan ikut terkirim sebagai konteks).
+        function buildConversationMessages() {
+          const bubbles = chatBox.querySelectorAll(
+            ".chat-message.user, .chat-message.bot:not(.greeting)"
+          );
+
+          const messages = [];
+
+          bubbles.forEach(function (bubble) {
+            // Lewati bubble bot yang isinya cuma indikator "sedang mikir"
+            // (kalau kebetulan masih ada saat fungsi ini dipanggil).
+            if (bubble.querySelector(".thinking-dots")) {
+              return;
+            }
+
+            // Lewati bubble user yang sedang dalam mode edit (input field),
+            // isinya belum final.
+            if (bubble.classList.contains("editing")) {
+              return;
+            }
+
+            const text = bubble.textContent.trim();
+
+            if (!text) {
+              return;
+            }
+
+            messages.push({
+              role: bubble.classList.contains("user") ? "user" : "assistant",
+              content: text
+            });
+          });
+
+          // Kalau kepanjangan, buang yang paling lama duluan supaya
+          // percakapan terbaru yang paling relevan tetap terkirim utuh.
+          if (messages.length > MAX_HISTORY_MESSAGES) {
+            return messages.slice(messages.length - MAX_HISTORY_MESSAGES);
+          }
+
+          return messages;
+        }
+
+        // ================= RIWAYAT CHAT (localStorage) =================
+        // Setiap "sesi" chat disimpan sebagai:
+        //   { id, title, messages: [{role, content}], updatedAt }
+        // Disimpan di localStorage milik domain website ini sendiri (bukan
+        // di server), jadi riwayatnya cuma tersimpan di browser/perangkat
+        // yang dipakai. Kalau localStorage tidak tersedia (mode privat
+        // ekstrem, dsb), fitur ini gagal secara diam-diam dan chat tetap
+        // bisa dipakai seperti biasa tanpa riwayat.
+        const SESSIONS_KEY = "kkuljaemChatSessions";
+        const ACTIVE_SESSION_KEY = "kkuljaemActiveSessionId";
+        const GREETING_TEXT =
+          "Annyeong! 👋 Aku asisten AI Kkuljaem Korea. Tanyakan apa saja ya!";
+
+        function loadSessions() {
+          try {
+            const raw = localStorage.getItem(SESSIONS_KEY);
+            return raw ? JSON.parse(raw) : [];
+          } catch (error) {
+            console.warn("Gagal membaca riwayat chat:", error);
+            return [];
+          }
+        }
+
+        function saveSessions(sessions) {
+          try {
+            localStorage.setItem(
+              SESSIONS_KEY,
+              JSON.stringify(sessions)
+            );
+          } catch (error) {
+            console.warn("Gagal menyimpan riwayat chat:", error);
+          }
+        }
+
+        function getActiveSessionId() {
+          try {
+            return localStorage.getItem(ACTIVE_SESSION_KEY);
+          } catch (error) {
+            return null;
+          }
+        }
+
+        function setActiveSessionId(id) {
+          try {
+            localStorage.setItem(ACTIVE_SESSION_KEY, id);
+          } catch (error) {
+            console.warn("Gagal menyimpan sesi aktif:", error);
+          }
+        }
+
+        function createSessionObject() {
+          return {
+            id:
+              "s" +
+              Date.now().toString(36) +
+              Math.random().toString(36).slice(2, 8),
+            title: "Chat baru",
+            messages: [],
+            updatedAt: Date.now()
+          };
+        }
+
+        function makeTitleFromText(text) {
+          const clean = text.replace(/\s+/g, " ").trim();
+          return clean.length > 42
+            ? clean.slice(0, 42) + "…"
+            : clean;
+        }
+
+        function sortByRecent(sessions) {
+          return sessions
+            .slice()
+            .sort(function (a, b) {
+              return b.updatedAt - a.updatedAt;
+            });
+        }
+
+        // Menulis ulang messages sesi aktif berdasarkan apa yang SEDANG
+        // tampil di chatBox saat ini (satu-satunya sumber kebenaran),
+        // supaya edit/hapus pesan otomatis ikut tersinkron ke riwayat.
+        function syncActiveSessionFromDOM() {
+          const sessions = loadSessions();
+          const activeId = getActiveSessionId();
+
+          const session = sessions.find(function (item) {
+            return item.id === activeId;
+          });
+
+          if (!session) {
+            return;
+          }
+
+          session.messages = buildConversationMessages();
+          session.updatedAt = Date.now();
+
+          if (session.title === "Chat baru") {
+            const firstUser = session.messages.find(function (m) {
+              return m.role === "user";
+            });
+
+            if (firstUser) {
+              session.title = makeTitleFromText(firstUser.content);
+            }
+          }
+
+          saveSessions(sessions);
+          renderSidebar();
+        }
+
+        function addGreeting() {
+          const greeting =
+            document.createElement("div");
+
+          greeting.className = "chat-message bot greeting";
+          greeting.textContent = GREETING_TEXT;
+
+          chatBox.appendChild(greeting);
+        }
+
+        function loadSessionIntoChat(session) {
+          chatBox.innerHTML = "";
+          addGreeting();
+
+          session.messages.forEach(function (message) {
+            addMessage(
+              message.content,
+              message.role === "user" ? "user" : "bot"
+            );
+          });
+
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function renderSidebar() {
+          const sessions = sortByRecent(loadSessions());
+          const activeId = getActiveSessionId();
+
+          historyList.innerHTML = "";
+
+          if (sessions.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "history-empty";
+            empty.textContent = "Belum ada riwayat chat.";
+            historyList.appendChild(empty);
+            return;
+          }
+
+          sessions.forEach(function (session) {
+            const item = document.createElement("div");
+            item.className =
+              "history-item" +
+              (session.id === activeId ? " active" : "");
+
+            const title = document.createElement("span");
+            title.className = "history-item-title";
+            title.textContent = session.title || "Chat baru";
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.type = "button";
+            deleteBtn.className = "history-delete-btn";
+            deleteBtn.setAttribute("aria-label", "Hapus chat ini");
+            deleteBtn.textContent = "✕";
+
+            deleteBtn.onclick = function (event) {
+              event.stopPropagation();
+              deleteSession(session.id);
+            };
+
+            item.appendChild(title);
+            item.appendChild(deleteBtn);
+
+            item.onclick = function () {
+              switchToSession(session.id);
+            };
+
+            historyList.appendChild(item);
+          });
+        }
+
+        function switchToSession(id) {
+          const sessions = loadSessions();
+
+          const session = sessions.find(function (item) {
+            return item.id === id;
+          });
+
+          if (!session) {
+            return;
+          }
+
+          setActiveSessionId(id);
+          loadSessionIntoChat(session);
+          renderSidebar();
+          closeSidebarOnMobile();
+        }
+
+        function startNewChat() {
+          const sessions = loadSessions();
+          const session = createSessionObject();
+
+          sessions.unshift(session);
+          saveSessions(sessions);
+          setActiveSessionId(session.id);
+
+          loadSessionIntoChat(session);
+          renderSidebar();
+          closeSidebarOnMobile();
+          chatInput.focus();
+        }
+
+        function deleteSession(id) {
+          let sessions = loadSessions();
+
+          sessions = sessions.filter(function (item) {
+            return item.id !== id;
+          });
+
+          const wasActive = getActiveSessionId() === id;
+
+          if (sessions.length === 0) {
+            const fresh = createSessionObject();
+            sessions.push(fresh);
+            saveSessions(sessions);
+            setActiveSessionId(fresh.id);
+            loadSessionIntoChat(fresh);
+          } else {
+            saveSessions(sessions);
+
+            if (wasActive) {
+              const next = sortByRecent(sessions)[0];
+              setActiveSessionId(next.id);
+              loadSessionIntoChat(next);
+            }
+          }
+
+          renderSidebar();
+        }
+
+        function openSidebar() {
+          chatSidebar.classList.add("open");
+          sidebarOverlay.classList.add("open");
+        }
+
+        function closeSidebar() {
+          chatSidebar.classList.remove("open");
+          sidebarOverlay.classList.remove("open");
+        }
+
+        function closeSidebarOnMobile() {
+          if (window.matchMedia("(max-width: 900px)").matches) {
+            closeSidebar();
+          }
+        }
+
+        function initChatHistory() {
+          let sessions = loadSessions();
+          let activeId = getActiveSessionId();
+
+          let activeSession = sessions.find(function (item) {
+            return item.id === activeId;
+          });
+
+          if (!activeSession) {
+            if (sessions.length > 0) {
+              activeSession = sortByRecent(sessions)[0];
+              setActiveSessionId(activeSession.id);
+            } else {
+              activeSession = createSessionObject();
+              sessions.push(activeSession);
+              saveSessions(sessions);
+              setActiveSessionId(activeSession.id);
+            }
+          }
+
+          loadSessionIntoChat(activeSession);
+          renderSidebar();
+        }
+
+        openSidebarBtn.onclick = openSidebar;
+        closeSidebarBtn.onclick = closeSidebar;
+        sidebarOverlay.onclick = closeSidebar;
+        newChatBtn.onclick = startNewChat;
+        // ================= AKHIR RIWAYAT CHAT =================
+
+        // Indikator "sedang mikir" bertitik-titik mantul, seperti Claude,
+        // dipakai selagi menunggu jawaban dari AI.
+        function addThinkingIndicator() {
+          const message =
+            document.createElement("div");
+
+          message.className = "chat-message bot";
+
+          const dots =
+            document.createElement("div");
+
+          dots.className = "thinking-dots";
+          dots.innerHTML =
+            "<span></span><span></span><span></span>";
+
+          message.appendChild(dots);
+
+          chatBox.appendChild(message);
+          chatBox.scrollTop =
+            chatBox.scrollHeight;
+
+          return message;
+        }
+
+        // Dipakai baik oleh pengiriman pesan baru maupun oleh
+        // pengiriman ulang setelah pesan diedit.
+        async function resendFrom(question) {
+          chatInput.disabled = true;
+          sendButton.disabled = true;
+
+          // Simpan pertanyaan user dulu, jaga-jaga kalau user
+          // menutup tab sebelum jawaban AI selesai.
+          syncActiveSessionFromDOM();
+
+          const loadingMessage =
+            addThinkingIndicator();
+
+          try {
+            const answer =
+              await askAI();
+
+            loadingMessage.remove();
+            addMessage(answer, "bot");
+          } catch (error) {
+            console.error(
+              "Groq API error:",
+              error
+            );
+
+            loadingMessage.remove();
+
+            addMessage(
+              "Maaf, terjadi masalah: " + error.message,
+              "error"
+            );
+          } finally {
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            syncActiveSessionFromDOM();
+          }
+        }
+
+        // API key ada di Cloudflare Worker (worker.js), tidak di sini.
+        const WORKER_URL =
+          "https://kkuljaem-korean.haedarrizky53.workers.dev";
+
+        async function askAI() {
+          // Pesan user yang baru saja ditambahkan ke DOM sudah ikut
+          // terhitung di sini, jadi tidak perlu ditambahkan lagi terpisah.
+          const conversationMessages =
+            buildConversationMessages();
+
+          const response = await fetch(
+            WORKER_URL,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "groq/compound",
+                messages: [
+                  {
+                    role: "system",
+                    content:
+                      "Kamu adalah asisten AI di website belajar " +
+                      "bahasa Korea bernama Kkuljaem Korea, dan " +
+                      "berperan sebagai Customer Service di sana. " +
+                      "Website ini berisi materi belajar Hangeul " +
+                      "(konsonan, vokal, dan dasar bahasa Korea), " +
+                      "halaman Tentang, Proyek, dan Kontak " +
+                      "(email: muhammadhaedarrizkyanwar@gmail.com, " +
+                      "Instagram: @mu.ha.riz_). " +
+                      "Meskipun begitu, kamu TIDAK dibatasi hanya " +
+                      "topik website ini saja. Kamu boleh dan harus " +
+                      "menjawab pertanyaan APAPUN dari pengguna secara " +
+                      "penuh dan lengkap, termasuk topik umum di luar " +
+                      "website ini (pengetahuan umum, sains, hitungan " +
+                      "matematika, pelajaran sekolah, hiburan, dll), " +
+                      "sama seperti asisten AI pada umumnya. Jangan " +
+                      "menolak atau mengalihkan pertanyaan hanya " +
+                      "karena tidak berkaitan dengan website ini. " +
+                      "Kamu punya kemampuan cari info terkini di web " +
+                      "(berita, jadwal, hasil pertandingan, dll) — " +
+                      "pakai itu kalau pertanyaan butuh data terbaru. " +
+                      "PENTING SOAL GAYA BICARA: sesuaikan panjang dan " +
+                      "gaya jawabanmu dengan pesan pengguna. Kalau " +
+                      "pengguna cuma menyapa santai (misalnya \"halo\", " +
+                      "\"hai\", \"woy\", \"pagi\"), balas SINGKAT dan " +
+                      "santai kayak ngobrol sama teman biasa (1-2 " +
+                      "kalimat pendek saja), JANGAN langsung menjelaskan " +
+                      "semua kemampuanmu atau daftar fitur website " +
+                      "panjang lebar — cukup sapa balik dan tanya mau " +
+                      "dibantu apa. Simpan jawaban panjang dan detail " +
+                      "hanya untuk pertanyaan yang memang butuh " +
+                      "penjelasan (soal materi, hitungan, pertanyaan " +
+                      "serius, dll). Gunakan bahasa sehari-hari yang " +
+                      "santai dan ramah, jangan kaku atau terlalu formal " +
+                      "seperti robot customer service. " +
+                      "PENTING: jangan gunakan format Markdown sama sekali " +
+                      "(jangan pakai tanda bintang **, tanda pagar #, " +
+                      "atau tanda strip - untuk daftar). Tulis jawaban " +
+                      "sebagai kalimat/paragraf biasa. Pisahkan setiap " +
+                      "paragraf atau poin dengan satu baris kosong supaya " +
+                      "mudah dibaca. " +
+                      "KHUSUS UNTUK RUMUS ATAU SIMBOL MATEMATIKA: tulis " +
+                      "dalam notasi LaTeX. Untuk rumus sebaris (di tengah " +
+                      "kalimat) apit dengan satu tanda dolar, contoh " +
+                      "$x^2 + y^2 = z^2$. Untuk rumus yang berdiri sendiri " +
+                      "sebagai baris terpisah, apit dengan dua tanda " +
+                      "dolar, contoh $$F = ma$$. Gunakan \\frac{a}{b} " +
+                      "untuk pecahan, ^{...} untuk pangkat, _{...} untuk " +
+                      "subskrip, dan \\sqrt{...} untuk akar. ATURAN WAJIB " +
+                      "SOAL SPASI: setelah perintah LaTeX seperti \\cdot, " +
+                      "\\cdotp, \\times, \\div, \\pm, atau huruf Yunani " +
+                      "(\\mu, \\alpha, \\pi, \\theta, dst), SELALU beri " +
+                      "spasi sebelum huruf berikutnya kalau huruf itu " +
+                      "adalah bagian dari kata/satuan lain, misalnya tulis " +
+                      "\"\\cdot \\text{m}^2\" JANGAN \"\\cdotm^2\", tulis " +
+                      "\"3\\ \\mu\\text{C}\" JANGAN \"3\\muC\", tulis " +
+                      "\"N\\cdot \\text{m}^2/\\text{C}^2\" JANGAN " +
+                      "\"N\\cdotpm^2/C^2\". Ini penting karena tanpa " +
+                      "spasi, huruf satuan akan menyatu jadi satu " +
+                      "perintah yang tidak valid dan rumus gagal " +
+                      "ditampilkan. " +
+                      "Gunakan bahasa yang sama dengan pengguna."
+                  },
+                  ...conversationMessages
+                ],
+                temperature: 0.7,
+                max_tokens: 1024
+              })
+            }
+          );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            const detail =
+              data?.error?.message ||
+              (response.status + " " + response.statusText);
+
+            throw new Error(detail);
+          }
+
+          const answer =
+            data?.choices?.[0]?.message?.content;
+
+          if (!answer) {
+            throw new Error("Jawaban Groq kosong.");
+          }
+
+          return fixLatexSpacing(cleanMarkdown(answer));
+        }
+
+        // Perintah LaTeX yang sering ditulis AI langsung nempel dengan
+        // huruf satuan sesudahnya (mis. "\cdotpm^2", "\muC"). Karena nama
+        // perintah LaTeX membaca SEMUA huruf setelah backslash sampai
+        // ketemu karakter non-huruf, "\cdotp" + "m" akan terbaca sebagai
+        // satu perintah "\cdotpm" yang tidak valid dan bikin KaTeX gagal
+        // merender (muncul teks merah, bahkan bisa merusak sisa rumus di
+        // sekitarnya). Fungsi ini menyisipkan spasi otomatis setelah
+        // perintah-perintah umum berikut kalau langsung diikuti huruf,
+        // sebagai jaring pengaman di luar instruksi ke AI.
+        function fixLatexSpacing(text) {
+          // Urutan penting: nama yang lebih panjang (mis. "cdotp") harus
+          // dicek LEBIH DULU daripada awalannya (mis. "cdot"), supaya
+          // "\cdotp" tidak salah terpotong jadi "\cdot" + "p".
+          const COMMANDS_NEEDING_SPACE = [
+            "cdotp", "cdot", "times", "div", "pm", "mp", "circ", "ast",
+            "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta",
+            "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "pi",
+            "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega",
+            "Delta", "Sigma", "Omega", "Lambda", "Gamma", "Theta", "Phi",
+            "Psi", "Xi"
+          ];
+
+          const pattern = new RegExp(
+            "\\\\(" + COMMANDS_NEEDING_SPACE.join("|") + ")(?=[a-zA-Z])",
+            "g"
+          );
+
+          return text.replace(pattern, "\\$1 ");
+        }
+
+        // Rapikan format: buang simbol Markdown, dan rapikan jarak
+        // antar paragraf (baris kosong ganda dipertahankan sebagai
+        // 1 jarak, baris kosong 3+ dirapikan supaya tidak jomplang).
+        function cleanMarkdown(text) {
+          return text
+            .replace(/\*\*(.*?)\*\*/g, "$1")
+            .replace(/\*(.*?)\*/g, "$1")
+            .replace(/__(.*?)__/g, "$1")
+            .replace(/`(.*?)`/g, "$1")
+            .replace(/^#{1,6}\s+/gm, "")
+            .replace(/^[-*]\s+/gm, "")
+            .replace(/\n{3,}/g, "\n\n")
+            .trim();
+        }
+
+        async function sendMessage() {
+          const question =
+            chatInput.value.trim();
+
+          if (!question) {
+            return;
+          }
+
+          addMessage(question, "user");
+          chatInput.value = "";
+
+          await resendFrom(question);
+          chatInput.focus();
+        }
+
+        sendButton.onclick = sendMessage;
+
+        chatInput.onkeydown = function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage();
+          }
+        };
+
+        initChatHistory();
+      }
+    );
+  </script>
+</body>
+</html>

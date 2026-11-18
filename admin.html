@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title data-i18n="adminTitle">Admin Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="translations.js"></script>
+    <script src="auth.js"></script>
+
+    <style>
+      body {
+        min-height: 100vh;
+        padding-top: 80px;
+        padding-bottom: 32px;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 100%
+        );
+      }
+
+      .admin-container {
+        max-width: 1200px;
+        padding: 32px 16px;
+        margin: 0 auto;
+      }
+
+      .admin-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 32px;
+        margin-bottom: 32px;
+        background: var(--panel);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .admin-title-group h1 {
+        margin-bottom: 8px;
+        color: var(--blue);
+        font-size: 2rem;
+      }
+
+      .admin-subtitle {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .logout-btn {
+        padding: 12px 24px;
+        color: #ffffff;
+        font-weight: 600;
+        background: linear-gradient(
+          135deg,
+          #dc3545,
+          #c82333
+        );
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+      }
+
+      .back-btn-container {
+        margin-bottom: 32px;
+      }
+
+      .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(240px, 1fr)
+        );
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        padding: 32px;
+        background: var(--panel);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-value {
+        margin-bottom: 8px;
+        color: var(--blue);
+        font-family: "Baloo 2", cursive;
+        font-size: 2.5rem;
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .admin-content {
+        padding: 32px;
+        overflow: hidden;
+        background: var(--panel);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        color: var(--text);
+        font-size: 1.5rem;
+      }
+
+      .table-responsive {
+        overflow-x: auto;
+        border-radius: 12px;
+      }
+
+      .user-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .user-table th {
+        padding: 16px;
+        color: #ffffff;
+        font-size: 0.9rem;
+        text-align: left;
+        background: linear-gradient(
+          135deg,
+          #667eea,
+          #764ba2
+        );
+      }
+
+      .user-table td {
+        padding: 16px;
+        color: var(--text);
+        font-size: 0.9rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .user-table tr:hover {
+        background: var(--bg);
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 20px;
+      }
+
+      .status-active {
+        color: #155724;
+        background: #d4edda;
+      }
+
+      .status-disabled {
+        color: #721c24;
+        background: #f8d7da;
+      }
+
+      .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .action-btn {
+        padding: 8px 14px;
+        color: #ffffff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .btn-disable {
+        color: #333333;
+        background: #ffc107;
+      }
+
+      .btn-enable {
+        background: #28a745;
+      }
+
+      .btn-delete {
+        background: #dc3545;
+      }
+
+      .loading,
+      .empty-state {
+        padding: 48px;
+        color: var(--muted);
+        font-size: 1.1rem;
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding-top: 70px;
+        }
+
+        .admin-header {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 24px;
+        }
+
+        .admin-content {
+          padding: 20px;
+        }
+
+        .user-table th,
+        .user-table td {
+          padding: 10px 8px;
+          font-size: 0.8rem;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        .action-btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <button
+          class="logo"
+          id="menuToggle"
+          type="button"
+          aria-label="Buka menu"
+        >
+          <span class="menu-icon">☰</span>
+        </button>
+
+        <ul class="nav-links">
+          <li>
+            <a href="index.html#home" data-i18n="navHome">
+              Home
+            </a>
+          </li>
+
+          <li>
+            <a href="tentang.html" data-i18n="navAbout">
+              Tentang
+            </a>
+          </li>
+
+          <li>
+            <a href="proyek.html" data-i18n="navProjects">
+              Proyek
+            </a>
+          </li>
+
+          <li class="has-submenu">
+            <button
+              type="button"
+              class="submenu-toggle"
+              data-i18n="navContact"
+            >
+              Kontak
+            </button>
+
+            <ul class="sub-menu">
+              <li>
+                <a href="cs.html" data-i18n="navCS">
+                  🤖 Customer Service
+                </a>
+              </li>
+
+              <li>
+                <a href="support.html" data-i18n="navSupport">
+                  🛠️ Support & Pengaturan
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="mailto:muhammadhaedarrizkyanwar@gmail.com"
+                  data-i18n="navEmail"
+                >
+                  ✉️ Email
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="https://www.instagram.com/mu.ha.riz_/"
+                  target="_blank"
+                  rel="noopener"
+                  data-i18n="navInstagram"
+                >
+                  📷 Instagram
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="has-submenu profile-menu">
+            <button
+              type="button"
+              class="submenu-toggle profile-toggle"
+              aria-label="Akun"
+            >
+              👤
+            </button>
+
+            <ul
+              class="sub-menu profile-dropdown"
+              data-profile-dropdown
+            ></ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="admin-container">
+      <section class="admin-header">
+        <div class="admin-title-group">
+          <h1 data-i18n="adminPanelTitle">
+            🔐 Admin Panel
+          </h1>
+
+          <p
+            class="admin-subtitle"
+            data-i18n="adminPanelSubtitle"
+          >
+            Kelola user dan akses aplikasi
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="logout-btn"
+          id="adminLogout"
+          data-i18n="adminLogout"
+        >
+          🚪 Logout
+        </button>
+      </section>
+
+      <div class="back-btn-container">
+        <button
+          type="button"
+          class="back-nav-btn"
+          data-i18n="backPrevious"
+          onclick="goBackOrHome('index.html')"
+        >
+          ← Kembali ke Halaman Sebelumnya
+        </button>
+      </div>
+
+      <section class="admin-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="totalUsers">0</div>
+          <div
+            class="stat-label"
+            data-i18n="totalUsersLabel"
+          >
+            Total User
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value" id="activeUsers">0</div>
+          <div
+            class="stat-label"
+            data-i18n="activeUsersLabel"
+          >
+            User Aktif
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value" id="disabledUsers">0</div>
+          <div
+            class="stat-label"
+            data-i18n="disabledUsersLabel"
+          >
+            User Nonaktif
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-content">
+        <h2
+          class="section-title"
+          data-i18n="usersListTitle"
+        >
+          👥 Daftar User
+        </h2>
+
+        <div
+          id="usersLoading"
+          class="loading"
+          data-i18n="loadingUsers"
+        >
+          <div style="font-size: 2rem; margin-bottom: 1rem">
+            ⏳
+          </div>
+
+          Memuat data user...
+        </div>
+
+        <div
+          class="table-responsive"
+          id="usersContent"
+          style="display: none"
+        >
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th data-i18n="emailLabel">Email</th>
+                <th data-i18n="nameLabel">Nama</th>
+                <th data-i18n="registeredDate">
+                  Terdaftar
+                </th>
+                <th data-i18n="statusLabel">Status</th>
+                <th data-i18n="actionLabel">Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+
+        <div
+          id="usersEmpty"
+          class="empty-state"
+          style="display: none"
+          data-i18n="noUsers"
+        >
+          <div style="font-size: 3rem; margin-bottom: 1rem">
+            📭
+          </div>
+
+          Belum ada user terdaftar.
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">
+        © 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷
+      </p>
+    </footer>
+
+    <script>
+      const usersLoading =
+        document.getElementById("usersLoading");
+
+      const usersContent =
+        document.getElementById("usersContent");
+
+      const usersEmpty =
+        document.getElementById("usersEmpty");
+
+      const usersTableBody =
+        document.getElementById("usersTableBody");
+
+      const totalUsersElement =
+        document.getElementById("totalUsers");
+
+      const activeUsersElement =
+        document.getElementById("activeUsers");
+
+      const disabledUsersElement =
+        document.getElementById("disabledUsers");
+
+      function getFirestoreDate(value) {
+        if (!value) {
+          return "-";
+        }
+
+        if (typeof value.toDate === "function") {
+          return value.toDate();
+        }
+
+        if (value.seconds) {
+          return new Date(value.seconds * 1000);
+        }
+
+        return new Date(value);
+      }
+
+      function createCell(text, isBold = false) {
+        const cell = document.createElement("td");
+
+        if (isBold) {
+          const strong = document.createElement("strong");
+          strong.textContent = text;
+          cell.appendChild(strong);
+        } else {
+          cell.textContent = text;
+        }
+
+        return cell;
+      }
+
+      function createStatusCell(isDisabled) {
+        const cell = document.createElement("td");
+        const badge = document.createElement("span");
+
+        badge.className =
+          "status-badge " +
+          (isDisabled
+            ? "status-disabled"
+            : "status-active");
+
+        badge.textContent = isDisabled
+          ? "❌ Nonaktif"
+          : "✅ Aktif";
+
+        cell.appendChild(badge);
+
+        return cell;
+      }
+
+      function createActionsCell(userId, isDisabled) {
+        const cell = document.createElement("td");
+        const wrapper = document.createElement("div");
+
+        wrapper.className = "action-buttons";
+
+        const statusButton =
+          document.createElement("button");
+
+        statusButton.type = "button";
+        statusButton.className =
+          "action-btn " +
+          (isDisabled ? "btn-enable" : "btn-disable");
+
+        statusButton.textContent = isDisabled
+          ? "🔓 Aktifkan"
+          : "🔒 Nonaktifkan";
+
+        statusButton.addEventListener("click", () => {
+          toggleUserStatus(userId, isDisabled);
+        });
+
+        const deleteButton =
+          document.createElement("button");
+
+        deleteButton.type = "button";
+        deleteButton.className =
+          "action-btn btn-delete";
+
+        deleteButton.textContent = "🗑️ Hapus";
+
+        deleteButton.addEventListener("click", () => {
+          deleteUser(userId);
+        });
+
+        wrapper.appendChild(statusButton);
+        wrapper.appendChild(deleteButton);
+        cell.appendChild(wrapper);
+
+        return cell;
+      }
+
+      async function loadUsers() {
+        usersLoading.style.display = "block";
+        usersContent.style.display = "none";
+        usersEmpty.style.display = "none";
+
+        try {
+          const snapshot = await db
+            .collection("users")
+            .orderBy("createdAt", "desc")
+            .get();
+
+          usersLoading.style.display = "none";
+          usersTableBody.innerHTML = "";
+
+          if (snapshot.empty) {
+            usersEmpty.style.display = "block";
+            totalUsersElement.textContent = "0";
+            activeUsersElement.textContent = "0";
+            disabledUsersElement.textContent = "0";
+            return;
+          }
+
+          let total = 0;
+          let active = 0;
+          let disabled = 0;
+
+          snapshot.forEach((userDocument) => {
+            const data = userDocument.data();
+            const isDisabled = data.isDisabled === true;
+
+            total++;
+
+            if (isDisabled) {
+              disabled++;
+            } else {
+              active++;
+            }
+
+            const row = document.createElement("tr");
+
+            const email = data.email || "-";
+            const name =
+              data.displayName ||
+              data.name ||
+              "-";
+
+            const createdDate =
+              getFirestoreDate(data.createdAt);
+
+            const formattedDate =
+              createdDate === "-"
+                ? "-"
+                : createdDate.toLocaleDateString(
+                    "id-ID",
+                    {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric"
+                    }
+                  );
+
+            row.appendChild(createCell(email, true));
+            row.appendChild(createCell(name));
+            row.appendChild(createCell(formattedDate));
+            row.appendChild(createStatusCell(isDisabled));
+            row.appendChild(
+              createActionsCell(
+                userDocument.id,
+                isDisabled
+              )
+            );
+
+            usersTableBody.appendChild(row);
+          });
+
+          totalUsersElement.textContent = total;
+          activeUsersElement.textContent = active;
+          disabledUsersElement.textContent = disabled;
+
+          usersContent.style.display = "block";
+        } catch (error) {
+          console.error("Load users error:", error);
+
+          usersLoading.textContent =
+            "Gagal memuat data user. Periksa Firestore dan aturan akses.";
+        }
+      }
+
+      async function toggleUserStatus(userId, isDisabled) {
+        const action = isDisabled
+          ? "mengaktifkan"
+          : "menonaktifkan";
+
+        const confirmed = window.confirm(
+          `Apakah Anda yakin ingin ${action} user ini?`
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          await db
+            .collection("users")
+            .doc(userId)
+            .update({
+              isDisabled: !isDisabled
+            });
+
+          window.alert(
+            `User berhasil ${
+              isDisabled ? "diaktifkan" : "dinonaktifkan"
+            }!`
+          );
+
+          await loadUsers();
+        } catch (error) {
+          console.error("Toggle user error:", error);
+          window.alert("Gagal mengubah status user.");
+        }
+      }
+
+      async function deleteUser(userId) {
+        const confirmed = window.confirm(
+          "Apakah Anda yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan!"
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          await db
+            .collection("users")
+            .doc(userId)
+            .delete();
+
+          window.alert("User berhasil dihapus!");
+          await loadUsers();
+        } catch (error) {
+          console.error("Delete user error:", error);
+          window.alert("Gagal menghapus user.");
+        }
+      }
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+          auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+              window.location.href = "login.html";
+              return;
+            }
+
+            try {
+              const userDocument = await db
+                .collection("users")
+                .doc(user.uid)
+                .get();
+
+              const userData = userDocument.data();
+
+              if (userData?.role !== "admin") {
+                window.alert(
+                  "Akses ditolak! Hanya admin yang bisa mengakses halaman ini."
+                );
+
+                window.location.href = "index.html";
+                return;
+              }
+
+              await loadUsers();
+            } catch (error) {
+              console.error("Admin verification error:", error);
+
+              window.alert(
+                "Gagal memeriksa akses admin."
+              );
+
+              window.location.href = "index.html";
+            }
+          });
+
+          const logoutButton =
+            document.getElementById("adminLogout");
+
+          if (logoutButton) {
+            logoutButton.addEventListener(
+              "click",
+              async () => {
+                try {
+                  await auth.signOut();
+                  window.location.href = "index.html";
+                } catch (error) {
+                  console.error("Logout error:", error);
+                  window.alert("Gagal logout.");
+                }
+              }
+            );
+          }
+        }
+      );
+    </script>
+  </body>
+</html>

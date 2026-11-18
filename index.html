@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <script src="translations.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title data-i18n="heroTitle">Kkuljaem Korea</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+
+    <style>
+      .login-modal{
+        display:none;
+        position:fixed;
+        inset:0;
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+        background:rgba(0,0,0,0.58);
+      }
+      .login-modal.show{ display:flex; }
+      .login-modal-content{
+        position:relative;
+        width:100%;
+        max-width:400px;
+        padding:36px 28px;
+        text-align:center;
+        background:var(--panel);
+        color:var(--text);
+        border:1px solid var(--line);
+        border-radius:20px;
+        box-shadow:var(--shadow);
+      }
+      .login-modal-icon{ font-size:3rem; margin-bottom:10px; }
+      .login-modal-title{ font-size:1.55rem; margin-bottom:8px; }
+      .login-modal-desc{ color:var(--muted); margin-bottom:22px; font-size:0.92rem; }
+      .login-modal-buttons{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+      .login-modal-btn{ padding:11px 16px; border-radius:999px; font-family:inherit; font-size:0.9rem; font-weight:600; }
+      .login-modal-btn.primary{ background:linear-gradient(90deg, var(--blue), var(--teal)); color:#ffffff; }
+      .login-modal-btn.secondary{ background:var(--bg); color:var(--text); border:1px solid var(--line); }
+      .login-modal-close{ position:absolute; top:10px; right:14px; border:none; background:none; color:var(--muted); font-size:1.7rem; cursor:pointer; }
+      .login-modal-close:hover{ color:var(--danger); }
+
+      .profile-toggle {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px 12px;
+        color: inherit;
+      }
+      .profile-toggle:hover {
+        opacity: 0.8;
+      }
+      .profile-dropdown {
+        min-width: 180px;
+      }
+      .profile-dropdown a {
+        display: block;
+        padding: 10px 16px;
+        color: inherit;
+        text-decoration: none;
+      }
+      .profile-dropdown a:hover {
+        background: rgba(15, 23, 42, 0.05);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="login-modal" id="loginModal" aria-hidden="true">
+      <div class="login-modal-content">
+        <button class="login-modal-close" id="closeModal" type="button" aria-label="Tutup">×</button>
+        <div class="login-modal-icon">🔒</div>
+        <h2 class="login-modal-title" data-i18n="loginRequired">Login Diperlukan</h2>
+        <p class="login-modal-desc" data-i18n="loginRequiredDesc">Untuk melihat progres belajar, silakan login terlebih dahulu. Belum punya akun? Daftar sekarang.</p>
+        <div class="login-modal-buttons">
+          <a href="login.html" class="login-modal-btn primary" data-i18n="loginButton">🔑 Login</a>
+          <a href="register.html" class="login-modal-btn secondary" data-i18n="registerButton">📝 Daftar</a>
+        </div>
+      </div>
+    </div>
+
+    <header>
+      <nav>
+        <button class="logo" id="menuToggle" aria-label="Buka menu">
+          <span class="menu-icon">☰</span>
+        </button>
+
+        <ul class="nav-links">
+          <li><a href="#home" class="active" data-i18n="navHome">Home</a></li>
+          <li><a href="tentang.html" data-i18n="navAbout">Tentang</a></li>
+          <li><a href="proyek.html" data-i18n="navProjects">Proyek</a></li>
+
+          <li class="has-submenu">
+            <button type="button" class="submenu-toggle" data-i18n="navContact">Kontak</button>
+            <ul class="sub-menu">
+              <li><a href="cs.html" data-i18n="navCS">🤖 Customer Service</a></li>
+              <li><a href="support.html" data-i18n="navSupport">🛠️ Support & Pengaturan</a></li>
+              <li><a href="mailto:muhammadhaedarrizkyanwar@gmail.com" data-i18n="navEmail">✉️ Email</a></li>
+              <li><a href="https://www.instagram.com/mu.ha.riz_/" target="_blank" rel="noopener" data-i18n="navInstagram">📷 Instagram</a></li>
+            </ul>
+          </li>
+
+          <li class="has-submenu profile-menu">
+            <button type="button" class="submenu-toggle profile-toggle" aria-label="Akun">👤</button>
+            <ul class="sub-menu profile-dropdown" data-profile-dropdown></ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section id="home" class="hero">
+        <div class="hero-text">
+          <p class="greeting">안녕하세요 여러분<br />Hello Everyone</p>
+          <h1>Kkuljaem<span class="highlight"> Korea</span></h1>
+          <h2 data-i18n="myProgress">Progres Belajar Bahasa Korea Saya</h2>
+          <p class="description" data-i18n="heroSubtitle">Belajar bahasa Korea dengan cara yang menyenangkan dan interaktif</p>
+          <a href="#" class="btn" id="goBtn" data-i18n="heroCTA">Mulai Belajar</a>
+        </div>
+
+        <div class="hero-image">
+          <img src="https://uploads.onecompiler.io/44zxfqqq5/44zxh6nn2/8100.png" alt="Foto profil" />
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">© 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷</p>
+    </footer>
+
+    <script>
+      // Catatan: pembukaan menu hamburger, dropdown "Kontak" dan dropdown
+      // "Profil" sudah ditangani secara terpusat oleh initNavigation() di
+      // auth.js. Jangan duplikasi listener klik untuk elemen yang sama di
+      // sini -- dua listener pada tombol yang sama akan saling membatalkan
+      // (buka lalu langsung tertutup lagi), makanya sebelumnya tombol
+      // Kontak/Profil terasa "tidak berfungsi".
+      window.addEventListener('DOMContentLoaded', () => {
+        const header = document.querySelector('header');
+        function updateHeaderShadow() {
+          header.classList.toggle('scrolled', window.scrollY > 10);
+        }
+        window.addEventListener('scroll', updateHeaderShadow);
+        updateHeaderShadow();
+
+        const goBtn = document.getElementById('goBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeModal = document.getElementById('closeModal');
+
+        goBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          if (auth.currentUser) {
+            window.location.href = 'proyek.html';
+          } else {
+            loginModal.classList.add('show');
+            loginModal.setAttribute('aria-hidden', 'false');
+          }
+        });
+
+        closeModal.addEventListener('click', () => {
+          loginModal.classList.remove('show');
+          loginModal.setAttribute('aria-hidden', 'true');
+        });
+
+        loginModal.addEventListener('click', (event) => {
+          if (event.target === loginModal) {
+            loginModal.classList.remove('show');
+            loginModal.setAttribute('aria-hidden', 'true');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

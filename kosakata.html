@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <script src="translations.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>어휘 - Kosakata</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>" />
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <style>
+      .material-hero{ background:linear-gradient(135deg, #0d9488, #22c55e); color:white; padding:160px 8vw 60px; text-align:center; }
+      .material-hero h1{ font-size:clamp(2rem, 5vw, 3rem); margin-bottom:16px; }
+      .material-content{ padding:60px 8vw; max-width:900px; margin:0 auto; }
+      .material-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:32px; margin-bottom:28px; }
+      .material-card h2{ font-size:1.5rem; margin-bottom:20px; color:var(--teal); }
+      .material-card p{ color:var(--muted); line-height:1.8; white-space:pre-line; }
+      .vocab-list{ display:grid; gap:16px; }
+      .vocab-item{ display:grid; grid-template-columns:1fr 2fr; gap:16px; padding:16px; background:var(--bg); border-radius:12px; border:1px solid var(--line); }
+      .vocab-korean{ font-size:1.3rem; font-weight:700; color:var(--teal); }
+      .vocab-indo{ color:var(--muted); }
+      .back-btn{ display:inline-block; padding:10px 24px; background:var(--panel); border:1px solid var(--line); border-radius:999px; color:var(--teal); font-weight:600; margin-bottom:24px; }
+      .back-btn:hover{ background:var(--bg); }
+      @media (max-width:780px){ .vocab-item{ grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <button class="logo" id="menuToggle">☰</button>
+        <ul class="nav-links">
+          <li><a href="index.html#home" data-i18n="navHome">Home</a></li>
+          <li><a href="tentang.html" data-i18n="navAbout">Tentang</a></li>
+          <li><a href="proyek.html" data-i18n="navProjects">Proyek</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="material-hero">
+        <h1>어휘<br /><span style="font-size:1.5rem" data-i18n="vocabSubtitle">Kosakata Dasar</span></h1>
+        <p data-i18n="vocabDesc2">Kosakata dasar untuk pemula</p>
+      </section>
+
+      <section class="material-content">
+        <a href="proyek.html" class="back-btn" data-i18n="backToProjects">← Kembali ke Proyek</a>
+
+        <div class="material-card">
+          <h2 data-i18n="vocab1Title">📚 Kosakata Dasar 1 - Sapaan</h2>
+          <div class="vocab-list">
+            <div class="vocab-item">
+              <div class="vocab-korean">안녕하세요</div>
+              <div class="vocab-indo" data-i18n="vocabGreeting1">Annyeonghaseyo - Halo / Apa kabar</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">감사합니다</div>
+              <div class="vocab-indo" data-i18n="vocabGreeting2">Gamsahamnida - Terima kasih</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">죄송합니다</div>
+              <div class="vocab-indo" data-i18n="vocabGreeting3">Joesonghamnida - Maaf</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">네</div>
+              <div class="vocab-indo" data-i18n="vocabGreeting4">Ne - Ya</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">아니요</div>
+              <div class="vocab-indo" data-i18n="vocabGreeting5">Aniyo - Tidak</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="vocab2Title">📚 Kosakata Dasar 2 - Angka</h2>
+          <div class="vocab-list">
+            <div class="vocab-item">
+              <div class="vocab-korean">하나</div>
+              <div class="vocab-indo" data-i18n="vocabNumber1">Hana - Satu</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">둘</div>
+              <div class="vocab-indo" data-i18n="vocabNumber2">Dul - Dua</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">셋</div>
+              <div class="vocab-indo" data-i18n="vocabNumber3">Set - Tiga</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">넷</div>
+              <div class="vocab-indo" data-i18n="vocabNumber4">Net - Empat</div>
+            </div>
+            <div class="vocab-item">
+              <div class="vocab-korean">다섯</div>
+              <div class="vocab-indo" data-i18n="vocabNumber5">Daseot - Lima</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="tipsTitle">💡 Tips Belajar</h2>
+          <p data-i18n="vocabTips">1. Hafalkan 5-10 kata per hari<br />2. Buat flashcard untuk latihan<br />3. Gunakan dalam kalimat sederhana<br />4. Praktik dengan native speaker</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">© 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷</p>
+    </footer>
+
+    <!--
+      Catatan: hamburger menu sudah ditangani otomatis oleh auth.js
+      (initNavigation), jadi script duplikat untuk menuToggle/theme/
+      renderProfileDropdown dihapus dari halaman ini.
+    -->
+  </body>
+</html>

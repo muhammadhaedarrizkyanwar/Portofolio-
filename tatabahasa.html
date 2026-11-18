@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <script src="translations.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>문법 - Tata Bahasa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>" />
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <style>
+      .material-hero{ background:linear-gradient(135deg, #667eea, #764ba2); color:white; padding:160px 8vw 60px; text-align:center; }
+      .material-hero h1{ font-size:clamp(2rem, 5vw, 3rem); margin-bottom:16px; }
+      .material-content{ padding:60px 8vw; max-width:900px; margin:0 auto; }
+      .material-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:32px; margin-bottom:28px; }
+      .material-card h2{ font-size:1.5rem; margin-bottom:20px; color:#667eea; }
+      .material-card p{ line-height:1.8; margin-bottom:16px; white-space:pre-line; }
+      .grammar-box{ background:var(--bg); padding:20px; border-radius:12px; margin-bottom:16px; border-left:4px solid #667eea; }
+      .grammar-box h3{ font-size:1.1rem; margin-bottom:10px; color:var(--text); }
+      .grammar-box .example{ color:var(--blue); font-weight:600; margin:8px 0; }
+      .grammar-box .meaning{ color:var(--muted); font-size:0.95rem; }
+      .back-btn{ display:inline-block; padding:10px 24px; background:var(--panel); border:1px solid var(--line); border-radius:999px; color:#667eea; font-weight:600; margin-bottom:24px; transition:transform .2s ease; }
+      .back-btn:hover{ transform:translateY(-2px); background:var(--bg); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <button class="logo" id="menuToggle">☰</button>
+        <ul class="nav-links">
+          <li><a href="index.html#home" data-i18n="navHome">Home</a></li>
+          <li><a href="tentang.html" data-i18n="navAbout">Tentang</a></li>
+          <li><a href="proyek.html" data-i18n="navProjects">Proyek</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="material-hero">
+        <h1>문법<br /><span style="font-size:1.5rem" data-i18n="grammarSubtitle">Tata Bahasa Korea</span></h1>
+        <p data-i18n="grammarDesc2">Pelajari pola kalimat dasar bahasa Korea</p>
+      </section>
+
+      <section class="material-content">
+        <a href="proyek.html" class="back-btn" data-i18n="backToProjects">← Kembali ke Proyek</a>
+
+        <div class="material-card">
+          <h2 data-i18n="grammarParticlesTitle">📚 Partikel Dasar</h2>
+          
+          <div class="grammar-box">
+            <h3 data-i18n="grammarParticle1Title">1. Partikel Subjek: 이/가</h3>
+            <p class="example">저는 학생이에요. (Jeoneun haksaengieyo.)</p>
+            <p class="meaning" data-i18n="grammarParticle1Meaning">Saya adalah pelajar.</p>
+          </div>
+
+          <div class="grammar-box">
+            <h3 data-i18n="grammarParticle2Title">2. Partikel Objek: 을/를</h3>
+            <p class="example">밥을 먹어요. (Babeul meogeoyo.)</p>
+            <p class="meaning" data-i18n="grammarParticle2Meaning">Saya makan nasi.</p>
+          </div>
+
+          <div class="grammar-box">
+            <h3 data-i18n="grammarParticle3Title">3. Partikel Lokasi: 에</h3>
+            <p class="example">학교에 가요. (Hakgyoe gayo.)</p>
+            <p class="meaning" data-i18n="grammarParticle3Meaning">Saya pergi ke sekolah.</p>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="grammarConjugationTitle">📚 Konjugasi Kata Kerja</h2>
+          
+          <div class="grammar-box">
+            <h3 data-i18n="grammarPresentTitle">1. Bentuk Present: -아/어요</h3>
+            <p class="example">먹다 → 먹어요 (meokda → meogeoyo)</p>
+            <p class="meaning" data-i18n="grammarPresentMeaning">Makan → Saya makan</p>
+          </div>
+
+          <div class="grammar-box">
+            <h3 data-i18n="grammarPastTitle">2. Bentuk Past: -았/었어요</h3>
+            <p class="example">먹다 → 먹었어요 (meokda → meogeosseoyo)</p>
+            <p class="meaning" data-i18n="grammarPastMeaning">Makan → Saya sudah makan</p>
+          </div>
+
+          <div class="grammar-box">
+            <h3 data-i18n="grammarFutureTitle">3. Bentuk Future: -을 거예요</h3>
+            <p class="example">먹다 → 먹을 거예요 (meokda → meogeul geo yeyo)</p>
+            <p class="meaning" data-i18n="grammarFutureMeaning">Makan → Saya akan makan</p>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="tipsTitle">💡 Tips Belajar</h2>
+          <p data-i18n="grammarTips">1. Pahami fungsi setiap partikel<br />2. Latihan membuat kalimat sederhana<br />3. Hafalkan konjugasi dasar<br />4. Baca dan terjemahkan teks Korea<br />5. Praktik berbicara setiap hari</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">© 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷</p>
+    </footer>
+
+    <!--
+      Catatan: hamburger menu sudah ditangani otomatis oleh auth.js
+      (initNavigation), jadi script duplikat untuk menuToggle dihapus
+      dari halaman ini.
+    -->
+  </body>
+</html>

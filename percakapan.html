@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <script src="translations.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="conversationPageTitle">회화 - Percakapan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>" />
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <style>
+      .material-hero{ background:linear-gradient(135deg, #4facfe, #00f2fe); color:white; padding:160px 8vw 60px; text-align:center; }
+      .material-hero h1{ font-size:clamp(2rem, 5vw, 3rem); margin-bottom:16px; }
+      .material-content{ padding:60px 8vw; max-width:900px; margin:0 auto; }
+      .material-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:32px; margin-bottom:28px; }
+      .material-card h2{ font-size:1.5rem; margin-bottom:20px; color:#4facfe; }
+      .material-card p{ line-height:1.8; margin-bottom:16px; }
+      .conversation{ background:var(--bg); padding:20px; border-radius:12px; margin-bottom:16px; }
+      .conversation .speaker{ font-weight:700; color:var(--blue); margin-bottom:8px; }
+      .conversation .korean{ font-size:1.1rem; margin-bottom:6px; }
+      .conversation .indo{ color:var(--muted); font-size:0.95rem; }
+      .back-btn{ display:inline-block; padding:10px 24px; background:var(--panel); border:1px solid var(--line); border-radius:999px; color:#4facfe; font-weight:600; margin-bottom:24px; transition:transform .2s ease; }
+      .back-btn:hover{ transform:translateY(-2px); background:var(--bg); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <button class="logo" id="menuToggle">☰</button>
+        <ul class="nav-links">
+          <li><a href="index.html#home" data-i18n="navHome">Home</a></li>
+          <li><a href="tentang.html" data-i18n="navAbout">Tentang</a></li>
+          <li><a href="proyek.html" data-i18n="navProjects">Proyek</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="material-hero">
+        <h1 data-i18n="conversationPageTitle">회화</h1>
+        <p data-i18n="conversationPageSubtitle">Percakapan Sehari-hari</p>
+        <p data-i18n="conversationPageDesc">Dialog untuk komunikasi sehari-hari</p>
+      </section>
+
+      <section class="material-content">
+        <a href="proyek.html" class="back-btn" data-i18n="backToProjects">← Kembali ke Proyek</a>
+
+        <div class="material-card">
+          <h2 data-i18n="conversation1">💬 Percakapan 1: Perkenalan</h2>
+          <div class="conversation">
+            <div class="speaker">A:</div>
+            <div class="korean">안녕하세요? 저는 민수예요.</div>
+            <div class="indo" data-i18n="conv1A1">Annyeonghaseyo? Jeoneun Minsuyeyo. (Halo? Saya Minsu.)</div>
+          </div>
+          <div class="conversation">
+            <div class="speaker">B:</div>
+            <div class="korean">안녕하세요? 저는 지나예요. 한국 사람이에요?</div>
+            <div class="indo" data-i18n="conv1B1">Annyeonghaseyo? Jeoneun Jinayeyo. Hanguk saramieyo? (Halo? Saya Gina. Apakah Anda orang Korea?)</div>
+          </div>
+          <div class="conversation">
+            <div class="speaker">A:</div>
+            <div class="korean">아니요, 저는 인도네시아 사람이에요.</div>
+            <div class="indo" data-i18n="conv1A2">Aniyo, jeoneun Indonesia saramieyo. (Bukan, saya orang Indonesia.)</div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="conversation2">💬 Percakapan 2: Di Restoran</h2>
+          <div class="conversation">
+            <div class="speaker">Pelayan:</div>
+            <div class="korean">무엇을 드시겠어요?</div>
+            <div class="indo" data-i18n="conv2Waiter1">Mueoseul deusigesseoyo? (Anda mau pesan apa?)</div>
+          </div>
+          <div class="conversation">
+            <div class="speaker">Pelanggan:</div>
+            <div class="korean">비빔밥 하나 주세요.</div>
+            <div class="indo" data-i18n="conv2Customer1">Bibimbap hana juseyo. (Bibimbap satu, please.)</div>
+          </div>
+          <div class="conversation">
+            <div class="speaker">Pelayan:</div>
+            <div class="korean">네, 알겠습니다.</div>
+            <div class="indo" data-i18n="conv2Waiter2">Ne, algetseumnida. (Ya, baik.)</div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <h2 data-i18n="tipsConversation">💡 Tips Belajar Percakapan</h2>
+          <p data-i18n="tipsConv1">1. Hafalkan ungkapan dasar sehari-hari</p>
+          <p data-i18n="tipsConv2">2. Praktik dengan teman atau native speaker</p>
+          <p data-i18n="tipsConv3">3. Dengarkan podcast/drama Korea</p>
+          <p data-i18n="tipsConv4">4. Rekam suara sendiri dan bandingkan</p>
+          <p data-i18n="tipsConv5">5. Jangan takut salah, yang penting praktik!</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">© 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷</p>
+    </footer>
+
+    <!--
+      Catatan: hamburger menu sudah ditangani otomatis oleh auth.js
+      (initNavigation), jadi script duplikat untuk menuToggle dihapus
+      dari halaman ini.
+    -->
+  </body>
+</html>

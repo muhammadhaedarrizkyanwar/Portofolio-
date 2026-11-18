@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title data-i18n="dashboardTitle">
+      Dashboard
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="translations.js"></script>
+    <script src="auth.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <button
+          class="logo"
+          id="menuToggle"
+          type="button"
+          aria-label="Buka menu"
+        >
+          <span class="menu-icon">☰</span>
+        </button>
+
+        <ul class="nav-links">
+          <li>
+            <a href="index.html#home" data-i18n="navHome">
+              Home
+            </a>
+          </li>
+
+          <li>
+            <a href="tentang.html" data-i18n="navAbout">
+              Tentang
+            </a>
+          </li>
+
+          <li>
+            <a href="proyek.html" data-i18n="navProjects">
+              Proyek
+            </a>
+          </li>
+
+          <li class="has-submenu">
+            <button
+              type="button"
+              class="submenu-toggle"
+              data-i18n="navContact"
+            >
+              Kontak
+            </button>
+
+            <ul class="sub-menu">
+              <li>
+                <a href="cs.html" data-i18n="navCS">
+                  🤖 Customer Service
+                </a>
+              </li>
+
+              <li>
+                <a href="support.html" data-i18n="navSupport">
+                  🛠️ Support & Pengaturan
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="mailto:muhammadhaedarrizkyanwar@gmail.com"
+                  data-i18n="navEmail"
+                >
+                  ✉️ Email
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="https://www.instagram.com/mu.ha.riz_/"
+                  target="_blank"
+                  rel="noopener"
+                  data-i18n="navInstagram"
+                >
+                  📷 Instagram
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="has-submenu profile-menu">
+            <button
+              type="button"
+              class="submenu-toggle profile-toggle"
+              aria-label="Akun"
+            >
+              👤
+            </button>
+
+            <ul
+              class="sub-menu profile-dropdown"
+              data-profile-dropdown
+            ></ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="dashboard-page">
+      <button
+        type="button"
+        class="back-previous-btn"
+        data-i18n="backPrevious"
+        onclick="goBackOrHome('index.html')"
+      >
+        ← Kembali ke Halaman Sebelumnya
+      </button>
+
+      <div class="dashboard-welcome">
+        <h1 data-i18n="dashboardGreeting">
+          Halo, <span data-user-name>Pelajar</span> 👋
+        </h1>
+
+        <p data-i18n="dashboardWelcomeText">
+          Selamat datang di dashboard kamu.
+        </p>
+      </div>
+
+      <div class="settings-card">
+        <h2 data-i18n="accountSettingsTitle">
+          Pengaturan Akun
+        </h2>
+
+        <div class="auth-error" data-settings-error></div>
+        <div class="auth-success" data-settings-success></div>
+
+        <form id="settingsForm">
+          <div class="form-group">
+            <label for="settingsName" data-i18n="nameLabel">
+              Nama Lengkap
+            </label>
+
+            <input
+              type="text"
+              id="settingsName"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label
+              for="settingsUsername"
+              data-i18n="usernameLabel"
+            >
+              Username
+            </label>
+
+            <input
+              type="text"
+              id="settingsUsername"
+              disabled
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="settingsEmail" data-i18n="emailLabel">
+              Email
+            </label>
+
+            <input
+              type="email"
+              id="settingsEmail"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label
+              for="settingsNewPassword"
+              data-i18n="newPasswordLabel"
+            >
+              Password Baru
+            </label>
+
+            <input
+              type="password"
+              id="settingsNewPassword"
+              minlength="6"
+              data-i18n-placeholder="newPasswordPlaceholder"
+              placeholder="Kosongkan jika tidak ganti"
+            />
+
+            <p
+              class="auth-switch"
+              style="margin-top: 6px; text-align: left"
+            >
+              <a
+                href="#"
+                id="requestPwCodeLink"
+                data-i18n="sendVerificationCode"
+              >
+                Kirim kode verifikasi ganti password
+              </a>
+            </p>
+          </div>
+
+          <div class="form-group">
+            <div
+              class="auth-success"
+              data-pw-code-hint
+            ></div>
+
+            <label
+              for="settingsVerifyCode"
+              data-i18n="verificationCodeLabel"
+            >
+              Kode Verifikasi
+            </label>
+
+            <input
+              type="text"
+              id="settingsVerifyCode"
+              data-i18n-placeholder="verificationCodePlaceholder"
+              placeholder="Isi kalau mau ganti password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label
+              for="settingsCurrentPassword"
+              data-i18n="currentPasswordLabel"
+            >
+              Password Saat Ini
+            </label>
+
+            <input
+              type="password"
+              id="settingsCurrentPassword"
+              required
+              data-i18n-placeholder="currentPasswordPlaceholder"
+              placeholder="Wajib diisi untuk konfirmasi"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn"
+            data-i18n="saveChanges"
+          >
+            Simpan Perubahan
+          </button>
+        </form>
+
+        <div class="danger-zone">
+          <h3 data-i18n="deleteAccountTitle">
+            Hapus Akun
+          </h3>
+
+          <p data-i18n="deleteAccountDesc">
+            Tindakan ini permanen dan tidak bisa dibatalkan.
+          </p>
+
+          <div class="auth-error" data-delete-error></div>
+
+          <div class="form-group">
+            <label for="deletePassword" data-i18n="passwordLabel">
+              Password
+            </label>
+
+            <input
+              type="password"
+              id="deletePassword"
+              data-i18n-placeholder="passwordPlaceholder"
+              placeholder="Masukkan password untuk konfirmasi"
+            />
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-outline danger-btn"
+            id="deleteAccountBtn"
+            data-i18n="deleteAccountBtn"
+          >
+            Hapus Akun Saya
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">
+        © 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷
+      </p>
+    </footer>
+
+    <script>
+      document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+          authGate();
+
+          const session = authGetSession();
+          const nameElement =
+            document.querySelector("[data-user-name]");
+
+          if (session && nameElement) {
+            nameElement.textContent = session.name;
+          }
+
+          auth.onAuthStateChanged((user) => {
+            if (!user) {
+              return;
+            }
+
+            const currentUser =
+              authGetCurrentUser();
+
+            if (!currentUser) {
+              return;
+            }
+
+            document.getElementById(
+              "settingsName"
+            ).value = currentUser.name;
+
+            document.getElementById(
+              "settingsUsername"
+            ).value = currentUser.username;
+
+            document.getElementById(
+              "settingsEmail"
+            ).value = currentUser.email;
+          });
+
+          const settingsError =
+            document.querySelector(
+              "[data-settings-error]"
+            );
+
+          const settingsSuccess =
+            document.querySelector(
+              "[data-settings-success]"
+            );
+
+          const pwCodeHint =
+            document.querySelector(
+              "[data-pw-code-hint]"
+            );
+
+          const requestCodeLink =
+            document.getElementById(
+              "requestPwCodeLink"
+            );
+
+          requestCodeLink.addEventListener(
+            "click",
+            async (event) => {
+              event.preventDefault();
+
+              const result =
+                authRequestPasswordChangeCode();
+
+              if (!result.ok) {
+                settingsError.textContent =
+                  result.message;
+
+                settingsError.classList.add("show");
+                return;
+              }
+
+              settingsError.classList.remove("show");
+
+              pwCodeHint.textContent =
+                "Mengirim kode verifikasi...";
+
+              pwCodeHint.classList.add("show");
+
+              const user =
+                authGetCurrentUser();
+
+              const sendResult =
+                await authSendVerificationEmail(
+                  user.email,
+                  user.name,
+                  result.code
+                );
+
+              pwCodeHint.textContent =
+                sendResult.sent
+                  ? "Kode verifikasi sudah dikirim ke email kamu."
+                  : `Kode verifikasi demo: ${result.code}`;
+            }
+          );
+
+          document
+            .getElementById("settingsForm")
+            .addEventListener(
+              "submit",
+              async (event) => {
+                event.preventDefault();
+
+                settingsError.classList.remove(
+                  "show"
+                );
+
+                settingsSuccess.classList.remove(
+                  "show"
+                );
+
+                const name =
+                  document.getElementById(
+                    "settingsName"
+                  ).value.trim();
+
+                const email =
+                  document.getElementById(
+                    "settingsEmail"
+                  ).value.trim();
+
+                const newPassword =
+                  document.getElementById(
+                    "settingsNewPassword"
+                  ).value;
+
+                const verificationCode =
+                  document.getElementById(
+                    "settingsVerifyCode"
+                  ).value.trim();
+
+                const currentPassword =
+                  document.getElementById(
+                    "settingsCurrentPassword"
+                  ).value;
+
+                const result =
+                  await authUpdateAccount({
+                    name,
+                    email,
+                    currentPassword,
+                    newPassword,
+                    verificationCode
+                  });
+
+                if (!result.ok) {
+                  settingsError.textContent =
+                    result.message;
+
+                  settingsError.classList.add("show");
+                  return;
+                }
+
+                settingsSuccess.textContent =
+                  "Perubahan berhasil disimpan.";
+
+                settingsSuccess.classList.add(
+                  "show"
+                );
+
+                document.getElementById(
+                  "settingsNewPassword"
+                ).value = "";
+
+                document.getElementById(
+                  "settingsVerifyCode"
+                ).value = "";
+
+                document.getElementById(
+                  "settingsCurrentPassword"
+                ).value = "";
+
+                pwCodeHint.classList.remove(
+                  "show"
+                );
+
+                const nameElement =
+                  document.querySelector(
+                    "[data-user-name]"
+                  );
+
+                if (nameElement) {
+                  nameElement.textContent = name;
+                }
+
+                renderProfileDropdown();
+              }
+            );
+
+          const deleteButton =
+            document.getElementById(
+              "deleteAccountBtn"
+            );
+
+          const deleteError =
+            document.querySelector(
+              "[data-delete-error]"
+            );
+
+          deleteButton.addEventListener(
+            "click",
+            async () => {
+              deleteError.classList.remove(
+                "show"
+              );
+
+              const password =
+                document.getElementById(
+                  "deletePassword"
+                ).value;
+
+              const result =
+                await authDeleteAccount(password);
+
+              if (!result.ok) {
+                deleteError.textContent =
+                  result.message;
+
+                deleteError.classList.add("show");
+                return;
+              }
+
+              window.location.href =
+                "index.html";
+            }
+          );
+        }
+      );
+    </script>
+  </body>
+</html>

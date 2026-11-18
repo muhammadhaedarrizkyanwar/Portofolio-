@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title data-i18n="supportTitle">
+      Support & Pengaturan
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="translations.js"></script>
+    <script src="auth.js"></script>
+
+    <style>
+      .support-hero {
+        padding: 160px 8vw 60px;
+        color: #ffffff;
+        text-align: center;
+        background: linear-gradient(
+          135deg,
+          var(--blue),
+          var(--teal)
+        );
+      }
+
+      .support-hero h1 {
+        margin-bottom: 16px;
+        font-size: clamp(2rem, 5vw, 3rem);
+      }
+
+      .support-content {
+        max-width: 800px;
+        padding: 60px 8vw;
+        margin: 0 auto;
+      }
+
+      .support-card {
+        padding: 32px;
+        margin-bottom: 28px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+      }
+
+      .support-card h2 {
+        margin-bottom: 20px;
+        color: var(--blue);
+        font-size: 1.5rem;
+      }
+
+      .support-card p {
+        margin-bottom: 16px;
+        line-height: 1.8;
+      }
+
+      .lang-section {
+        padding-top: 32px;
+        margin-top: 32px;
+        border-top: 1px solid var(--line);
+      }
+
+      .lang-section h3 {
+        margin-bottom: 16px;
+        color: var(--text);
+        font-size: 1.2rem;
+      }
+
+      .lang-switcher {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .lang-btn {
+        padding: 10px 20px;
+        color: var(--text);
+        font-family: "Baloo 2", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        background: var(--bg);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .lang-btn:hover,
+      .lang-btn.active {
+        color: #ffffff;
+        background: var(--blue);
+        border-color: var(--blue);
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <button
+          class="logo"
+          id="menuToggle"
+          type="button"
+          aria-label="Buka menu"
+        >
+          <span class="menu-icon">☰</span>
+        </button>
+
+        <ul class="nav-links">
+          <li>
+            <a href="index.html#home" data-i18n="navHome">
+              Home
+            </a>
+          </li>
+
+          <li>
+            <a href="tentang.html" data-i18n="navAbout">
+              Tentang
+            </a>
+          </li>
+
+          <li>
+            <a href="proyek.html" data-i18n="navProjects">
+              Proyek
+            </a>
+          </li>
+
+          <li class="has-submenu">
+            <button
+              type="button"
+              class="submenu-toggle"
+              data-i18n="navContact"
+            >
+              Kontak
+            </button>
+
+            <ul class="sub-menu">
+              <li>
+                <a href="cs.html" data-i18n="navCS">
+                  🤖 Customer Service
+                </a>
+              </li>
+
+              <li>
+                <a href="support.html" data-i18n="navSupport">
+                  🛠️ Support & Pengaturan
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="mailto:muhammadhaedarrizkyanwar@gmail.com"
+                  data-i18n="navEmail"
+                >
+                  ✉️ Email
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="https://www.instagram.com/mu.ha.riz_/"
+                  target="_blank"
+                  rel="noopener"
+                  data-i18n="navInstagram"
+                >
+                  📷 Instagram
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="has-submenu profile-menu">
+            <button
+              type="button"
+              class="submenu-toggle profile-toggle"
+              aria-label="Akun"
+            >
+              👤
+            </button>
+
+            <ul
+              class="sub-menu profile-dropdown"
+              data-profile-dropdown
+            ></ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="support-hero">
+        <h1 data-i18n="supportTitle">
+          Support & Pengaturan
+        </h1>
+
+        <p data-i18n="supportSubtitle">
+          Bantuan dan pengaturan akun Anda
+        </p>
+      </section>
+
+      <section class="support-content">
+        <button
+          type="button"
+          class="back-previous-btn"
+          data-i18n="backPrevious"
+          onclick="goBackOrHome('index.html')"
+        >
+          ← Kembali ke Halaman Sebelumnya
+        </button>
+
+        <div class="support-card">
+          <h2 data-i18n="accountSettings">
+            ⚙️ Pengaturan Akun
+          </h2>
+
+          <p data-i18n="accountSettingsDesc">
+            Kelola pengaturan akun Anda, termasuk email,
+            password, dan preferensi lainnya.
+          </p>
+        </div>
+
+        <div class="support-card">
+          <h2 data-i18n="helpCenter">
+            ❓ Pusat Bantuan
+          </h2>
+
+          <p data-i18n="helpCenterDesc">
+            Temukan jawaban untuk pertanyaan umum tentang
+            penggunaan platform.
+          </p>
+        </div>
+
+        <div class="support-card">
+          <h2 data-i18n="contactSupport">
+            📞 Kontak Support
+          </h2>
+
+          <p data-i18n="contactSupportDesc">
+            Butuh bantuan lebih lanjut? Tim support kami siap
+            membantu Anda.
+          </p>
+
+          <p>
+            Email:
+            muhammadhaedarrizkyanwar@gmail.com
+          </p>
+        </div>
+
+        <div class="lang-section">
+          <h3 data-i18n="languageSettings">
+            🌐 Pengaturan Bahasa
+          </h3>
+
+          <p data-i18n="languageDesc">
+            Pilih bahasa yang ingin digunakan di seluruh
+            platform.
+          </p>
+
+          <div class="lang-switcher">
+            <button
+              type="button"
+              class="lang-btn"
+              data-lang="id"
+              onclick="changeLanguage('id')"
+            >
+              🇮🇩 Indonesia
+            </button>
+
+            <button
+              type="button"
+              class="lang-btn"
+              data-lang="en"
+              onclick="changeLanguage('en')"
+            >
+              🇺🇸 English
+            </button>
+
+            <button
+              type="button"
+              class="lang-btn"
+              data-lang="ko"
+              onclick="changeLanguage('ko')"
+            >
+              🇰🇷 한국어
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p data-i18n="footerText">
+        © 2026 Muhammad Haedar Rizky Anwar. 화이팅! 🇰🇷
+      </p>
+    </footer>
+  </body>
+</html>
