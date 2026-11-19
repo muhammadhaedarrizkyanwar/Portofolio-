@@ -1529,7 +1529,7 @@
                 "Content-Type": "application/json"
               },
               body: JSON.stringify({
-                model: "groq/compound",
+                model: "openai/gpt-oss-120b",
                 messages: [
                   {
                     role: "system",
@@ -1551,9 +1551,10 @@
                       "sama seperti asisten AI pada umumnya. Jangan " +
                       "menolak atau mengalihkan pertanyaan hanya " +
                       "karena tidak berkaitan dengan website ini. " +
-                      "Kamu punya kemampuan cari info terkini di web " +
-                      "(berita, jadwal, hasil pertandingan, dll) — " +
-                      "pakai itu kalau pertanyaan butuh data terbaru. " +
+                      "Kamu TIDAK bisa mencari info terkini di internet, " +
+                      "jadi kalau ditanya berita, jadwal, atau hasil " +
+                      "terbaru, bilang terus terang bahwa kamu tidak " +
+                      "punya akses data terbaru. " +
                       "PENTING SOAL GAYA BICARA: sesuaikan panjang dan " +
                       "gaya jawabanmu dengan pesan pengguna. Kalau " +
                       "pengguna cuma menyapa santai (misalnya \"halo\", " +
@@ -1599,7 +1600,8 @@
                   ...conversationMessages
                 ],
                 temperature: 0.7,
-                max_tokens: 1024
+                reasoning_effort: "low",
+                max_tokens: 2048
               })
             }
           );
