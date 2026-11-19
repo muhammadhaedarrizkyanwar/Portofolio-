@@ -49,7 +49,13 @@ function renderProfileDropdown() {
   if (!dropdown) return;
 
   auth.onAuthStateChanged(async (user) => {
+    const profileToggle = dropdown.parentElement
+      ? dropdown.parentElement.querySelector(".profile-toggle")
+      : null;
+
     if (!user) {
+      setProfileToggle(profileToggle, null);
+
       dropdown.innerHTML = `
         <li>
           <a href="login.html">🔑 Login</a>
@@ -62,6 +68,8 @@ function renderProfileDropdown() {
     }
 
     const session = getAuthUserData(user);
+
+    setProfileToggle(profileToggle, session);
 
     let isAdmin = false;
 
@@ -119,6 +127,38 @@ function renderProfileDropdown() {
       });
     }
   });
+}
+
+// Isi tombol profil: foto (mis. dari Google), kalau tidak ada
+// pakai huruf pertama nama, kalau belum login pakai ikon 👤.
+function setProfileToggle(toggle, session) {
+  if (!toggle) return;
+
+  toggle.classList.remove("has-initial");
+
+  if (!session) {
+    toggle.textContent = "👤";
+    return;
+  }
+
+  const showInitial = () => {
+    toggle.textContent = (session.name || "U").trim().charAt(0).toUpperCase();
+    toggle.classList.add("has-initial");
+  };
+
+  if (!session.photoURL) {
+    showInitial();
+    return;
+  }
+
+  const img = document.createElement("img");
+  img.alt = "";
+  img.referrerPolicy = "no-referrer";
+  img.src = session.photoURL;
+  img.addEventListener("error", showInitial);
+
+  toggle.textContent = "";
+  toggle.appendChild(img);
 }
 
 // Mencegah teks user masuk sebagai HTML
@@ -405,6 +445,81 @@ async function authIsAdmin() {
   } catch (error) {
     console.error("Admin check error:", error);
     return false;
+  }
+}
+
+// ===============================
+// LOGIN DENGAN GOOGLE
+// ===============================
+
+async function authSignInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+
+  const result = await auth.signInWithPopup(provider);
+  const user = result.user;
+
+  const userRef = db.collection("users").doc(user.uid);
+  const snapshot = await userRef.get();
+
+  if (snapshot.exists) {
+    if (snapshot.data()?.isDisabled === true) {
+      await auth.signOut();
+
+      const disabledError = new Error("Akun dinonaktifkan.");
+      disabledError.code = "app/user-disabled";
+      throw disabledError;
+    }
+  } else {
+    // Pertama kali masuk lewat Google: buat dokumen user biasa
+    await userRef.set({
+      uid: user.uid,
+      email: user.email || "",
+      displayName: user.displayName || "User",
+      role: "user",
+      isDisabled: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  return user;
+}
+
+async function handleGoogleLogin(showError, button) {
+  if (button) button.disabled = true;
+
+  try {
+    const user = await authSignInWithGoogle();
+
+    localStorage.setItem("userEmail", user.email || "");
+    window.location.href = "index.html";
+  } catch (error) {
+    console.error("Google login error:", error);
+
+    const messages = {
+      "auth/popup-blocked":
+        "Popup diblokir browser. Izinkan popup lalu coba lagi.",
+      "auth/unauthorized-domain":
+        "Domain ini belum diizinkan di Firebase (Authentication → Settings → Authorized domains).",
+      "auth/operation-not-allowed":
+        "Login Google belum diaktifkan di Firebase.",
+      "auth/network-request-failed":
+        "Koneksi bermasalah. Coba lagi.",
+      "app/user-disabled":
+        "Akun kamu dinonaktifkan."
+    };
+
+    // Popup ditutup sendiri oleh user: tidak perlu pesan error
+    if (
+      error.code !== "auth/popup-closed-by-user" &&
+      error.code !== "auth/cancelled-popup-request"
+    ) {
+      showError(
+        messages[error.code] || "Gagal login dengan Google. Coba lagi."
+      );
+    }
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
