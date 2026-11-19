@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{userId} {
+      // Baca: pemilik dokumen atau admin
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+
+      // Daftar: hanya boleh membuat dokumen sendiri dengan role "user"
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == 'user';
+
+      // Update: pemilik boleh ubah data sendiri, TAPI tidak boleh ubah role/isDisabled
+      // Admin boleh ubah semuanya
+      allow update: if isAdmin() || (
+        signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.get('isDisabled', false) == resource.data.get('isDisabled', false)
+      );
+
+      // Hapus: pemilik (hapus akun sendiri) atau admin
+      allow delete: if signedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Koleksi lain: ditolak
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
